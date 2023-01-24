@@ -10,25 +10,7 @@ import {useWeb3} from "@providers/web3";
 
 const Home: NextPage = () => {
   const { network } = useNetwork();
-  const {contract, ethereum, provider}=useWeb3()
 
-
-  useEffect(()=>{
-    if(contract !== null){
-      console.log(contract, contract._runningEvents, provider?._events, ethereum)
-      let accounts = ethereum?.request({method: 'eth_requestAccounts' })
-
-      ethereum?.eventNames().map((data)=>{
-        console.log(data)
-      })
-
-
-
-
-    }
-
-
-  },[contract])
 
   return (
     <BaseLayout>

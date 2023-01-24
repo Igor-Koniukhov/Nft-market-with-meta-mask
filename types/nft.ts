@@ -13,6 +13,12 @@ export type NftMeta = {
   attributes: NftAttribute[];
 }
 
+export type UserData ={
+  userName: string;
+  userLastName: string;
+  email: string;
+}
+
 export type NftCore = {
   tokenId: number;
   price: number;

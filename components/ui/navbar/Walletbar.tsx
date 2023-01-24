@@ -66,12 +66,24 @@ const Walletbar: FunctionComponent<WalletbarProps> = ({
                 <a
                   className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                 >
-                  Profile
+                  Your collection
                 </a>
               </Link>
 
             )}
           </Menu.Item>
+            <Menu.Item>
+                {({ active }) => (
+                    <Link href="/profile/setting">
+                        <a
+                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                        >
+                            settings
+                        </a>
+                    </Link>
+
+                )}
+            </Menu.Item>
         </Menu.Items>
       </Menu>
     )
