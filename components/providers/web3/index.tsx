@@ -1,8 +1,10 @@
 import { createContext, FunctionComponent, useContext, useEffect, useState } from "react"
-import { createDefaultState, createWeb3State, loadContract, Web3State } from "./utils";
+import {createDefaultState, createWeb3State, loadContract, loadDBContract, Web3State} from "./utils";
 import { ethers } from "ethers";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import { NftMarketContract } from "@_types/nftMarketContract";
+import {profileContract} from "../../../userDB/config";
+import {ProfileContract} from "@_types/profileContract";
 
 const pageReload = () => { window.location.reload(); }
 
@@ -31,15 +33,19 @@ const Web3Provider: FunctionComponent = ({children}) => {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum as any);
         const contract =  await loadContract("NftMarket", provider);
+        const contractDB =  await loadDBContract("UserDB", provider);
 
         const signer = provider.getSigner();
         const signedContract = contract.connect(signer);
+        const signedDBContract = contractDB.connect(signer);
+
 
         setTimeout(() => setGlobalListeners(window.ethereum), 500);
         setWeb3Api(createWeb3State({
           ethereum: window.ethereum,
           provider,
           contract: signedContract as unknown as NftMarketContract,
+          profileContract: signedDBContract as unknown as ProfileContract,
           isLoading: false
         }))
       } catch(e: any) {

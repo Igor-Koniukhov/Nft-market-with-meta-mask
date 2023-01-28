@@ -3,6 +3,7 @@
 import { Menu } from "@headlessui/react";
 import Link from "next/link";
 import { FunctionComponent } from "react";
+import {useProfile} from "@hooks/web3";
 
 type WalletbarProps = {
   isLoading: boolean;
@@ -21,6 +22,7 @@ const Walletbar: FunctionComponent<WalletbarProps> = ({
   connect,
   account
 }) => {
+   const {profile}= useProfile();
 
   if (isLoading) {
     return (
@@ -42,11 +44,19 @@ const Walletbar: FunctionComponent<WalletbarProps> = ({
         <div>
           <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
             <span className="sr-only">Open user menu</span>
-            <img
-              className="h-8 w-8 rounded-full"
-              src="/images/default_user_image.png"
-              alt=""
-            />
+              {profile.data?.image ?
+                  <img
+                      className="h-12 w-12 rounded-full"
+                      src={profile.data?.image}
+                      alt="user image"
+                  /> :
+                  <img
+                      className="h-12 w-12 rounded-full"
+                      src="/images/default_user_image.png"
+                      alt="user image"
+                  />
+
+              }
           </Menu.Button>
         </div>
 

@@ -42,9 +42,9 @@ export const networkSlice = createSlice({
 })
 
 export const { setNameNetwork, setNetState, setNetworkId, setAccount, setBalance } = networkSlice.actions
-export const selectNetState = (state) => state.network.netState
-export const selectNetworkId = (state) => state.network.networkId
-export const selectNameNetwork = (state) => state.network.nameNetwork
-export const selectAccount = (state) => state.network.account
-export const selectBalance = (state) => state.network.balance
+export const selectNetState = (state: any) => state.network.netState
+export const selectNetworkId = (state: any) => state.network.networkId
+export const selectNameNetwork = (state: any) => state.network.nameNetwork
+export const selectAccount = (state: any) => state.network.account
+export const selectBalance = (state: any) => state.network.balance
 export default networkSlice.reducer

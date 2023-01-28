@@ -1,21 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 
 import type { NextPage } from 'next'
-import {ChangeEvent, useEffect, useState} from 'react';
+import {ChangeEvent, useState} from 'react';
 import { BaseLayout } from '@ui'
 import {PinataRes, UserData} from '@_types/nft';
 import axios from 'axios';
 import { useWeb3 } from '@providers/web3';
 import { toast } from "react-toastify";
-import {useAccount, useNetwork} from '@hooks/web3';
+import {useAccount, useNetwork, useProfile} from '@hooks/web3';
 import { ExclamationIcon } from '@heroicons/react/solid';
-import {ethConnect, usercontract} from '../../userDB/config';
 
 
 
 const NftCreate: NextPage = () => {
-  const {ethereum} = useWeb3();
-  const {account}=useAccount();
+ const {profile} = useProfile();
   const {network} = useNetwork();
   const [userURI, setUserURI] = useState("");
   const [imageURI, setImageURI]=useState("");
@@ -88,7 +86,7 @@ const NftCreate: NextPage = () => {
       const data = res.data as PinataRes;
       setUserURI(`${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`);
 
-        await usercontract.createProfile(`${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`, imageURI, addressWallet);
+        await profile.createProfile(`${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`, imageURI);
 
 
     } catch (e: any) {
@@ -97,12 +95,7 @@ const NftCreate: NextPage = () => {
   }
 
 
-const getUserData= async ()=>{
-  await usercontract.getUserProfileData(addressWallet).then((data: any)=>{
-    console.log(data)
-  })
 
-}
 
   if (!network.isConnectedToNetwork) {
     return (
@@ -135,7 +128,6 @@ const getUserData= async ()=>{
       <div>
 
         <div className="md:grid md:grid-cols-3 md:gap-6">
-          <button onClick={getUserData} type="button">Click</button>
           <div className="md:col-span-1">
             <div className="px-4 sm:px-0">
               <h3 className="text-lg font-medium leading-6 text-gray-900">Set up your profile</h3>

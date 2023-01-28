@@ -10,6 +10,15 @@ export const useAccount = () => {
   }
 }
 
+export const useProfile = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useProfile();
+
+  return {
+    profile: swrRes
+  }
+}
+
 export const useNetwork = () => {
   const hooks = useHooks();
   const swrRes = hooks.useNetwork();

@@ -1,6 +1,5 @@
 const AccountIndex = 0;
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const keys = require("./keys.json");
 require("dotenv").config({path: "./.env.development"});
 
 module.exports = {
@@ -18,13 +17,13 @@ module.exports = {
       network_id: 1337
     },
 
-    ropsten: {
+    goerly: {
       provider: () => 
         new HDWalletProvider(
-          keys.PRIVATE_KEY,
-          keys.INFURA_ROPSTEN_URL
+         process.env.MNEMONIC,
+          process.env.NEXT_PUBLIC_ALCHEMY_NFT
         ),
-      network_id: 3,
+      network_id: 5,
       gas: 5500000,
       gasPrice: 20000000000,
       confirmations: 2,

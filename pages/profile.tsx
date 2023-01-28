@@ -4,7 +4,7 @@ import type {NextPage} from 'next'
 import {BaseLayout} from '@ui'
 
 import {Nft, NftMeta, PinataRes} from '@_types/nft';
-import {useAccount, useOwnedNfts} from '@hooks/web3';
+import {useAccount, useOwnedNfts, useProfile} from '@hooks/web3';
 import {useEffect, useState} from 'react';
 import {useWeb3} from "@providers/web3";
 import {useEthPrice} from "@hooks/useEthPrice";
@@ -22,9 +22,10 @@ function classNames(...classes: string[]) {
 
 const Profile: NextPage = () => {
     const {nfts} = useOwnedNfts()
+    const {profile} = useProfile()
     const {account} = useAccount()
     const {eth} = useEthPrice()
-    const {contract, provider, ethereum} = useWeb3()
+    const {contract, provider, ethereum, profileContract} = useWeb3()
     const [activeNft, setActiveNft] = useState<Nft>();
     const [royalty, setRoyalty] = useState<number | undefined>(activeNft?.tokenId)
     const [royaltyAmount, setRoyaltyAmount] = useState("")
@@ -152,6 +153,31 @@ const Profile: NextPage = () => {
                             <div className="pt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                                 <div className="flex">
                                     <h1 className="flex-1 text-2xl font-bold text-gray-900">Your NFTs</h1>
+                                    <div className="flex align-baseline">
+                                        <div className=" ml-2 mr-1 flex justify-around align-baseline">{profile.data?.userName ?
+                                            <>
+                                                <div className="pt-3 pb-3 ">{profile.data.userName}  {profile.data.userLastName}</div>
+
+                                            </>
+                                            :
+                                           <div className="pt-3 pb-3 ">John Dou</div> }
+                                        </div>
+                                        <div>
+                                        {profile.data?.image ?
+
+                                            <img
+                                                className="h-12 w-12 rounded-full"
+                                                src={profile.data?.image}
+                                                alt="user image"
+                                            /> :
+                                            <img
+                                                className="h-12 w-12 rounded-full"
+                                                src="/images/default_user_image.png"
+                                                alt="user image"
+                                            />
+                                        }
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="mt-3 sm:mt-2">
                                     <div className="hidden sm:block">

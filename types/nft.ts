@@ -18,6 +18,12 @@ export type UserData ={
   userLastName: string;
   email: string;
 }
+export type UserDataResponse ={
+  userName: string;
+  userLastName: string;
+  email: string;
+  image: string;
+}
 
 export type NftCore = {
   tokenId: number;

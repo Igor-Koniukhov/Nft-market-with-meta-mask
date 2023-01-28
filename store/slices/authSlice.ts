@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { HYDRATE } from 'next-redux-wrapper'
+import { createSlice } from '@reduxjs/toolkit';
+import { HYDRATE } from 'next-redux-wrapper';
 
 const initialState = {
     authState: false,
@@ -30,6 +30,6 @@ export const authSlice = createSlice({
 })
 
 export const { setAuthState, setAuthUser } = authSlice.actions
-export const selectAuthState = (state) => state.auth.authState
-export const selectAuthUser = (state) => state.auth.authUser
+export const selectAuthState = (state: any) => state.auth.authState
+export const selectAuthUser = (state: any) => state.auth.authUser
 export default authSlice.reducer

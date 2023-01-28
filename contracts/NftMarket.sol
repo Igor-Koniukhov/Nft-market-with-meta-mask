@@ -49,6 +49,21 @@ contract NftMarket is ERC721URIStorage, Ownable {
         bool isListed,
         bool isSold
     );
+    event NftBought (
+        uint tokenId,
+        uint price,
+        uint royaltyAmount,
+        address previousOwner,
+        address owner,
+        uint boughtAt
+    );
+    event TokenIsMinted (
+        uint tokenId,
+        address creator,
+        string tokenURI,
+        uint mintedAt
+    );
+
     event RoyaltyAmountSent (
         address receiver,
         uint tokenId,
@@ -116,6 +131,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return items;
     }
 
+
+
     function getOwnedNfts() public view returns (NftItem[] memory) {
         uint ownedItemsCount = ERC721.balanceOf(msg.sender);
         NftItem[] memory items = new NftItem[](ownedItemsCount);
@@ -152,9 +169,12 @@ contract NftMarket is ERC721URIStorage, Ownable {
             _createNftItem(newTokenId, price);
             _usedTokenURIs[tokenURI] = true;
         }
+        uint mintedAt = block.timestamp;
+        emit TokenIsMinted(newTokenId, msg.sender, tokenURI, mintedAt);
         return newTokenId;
-
     }
+
+
 
     //interface for royalties
     function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool){
@@ -216,7 +236,11 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _listedItems.decrement();
         _idToNftItem[tokenId].isListed = false;
         _idToNftItem[tokenId].isSold = true;
+        uint boughtAt = block.timestamp;
+
+        emit NftBought(tokenId, msg.value, royaltyAmount, owner, msg.sender, boughtAt);
     }
+
     //Withdraw money in contract to Owner
     function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;

@@ -36,3 +36,5 @@ PINATA_SECRET_API_KEY={your api secret key from pinata}
 4. Now everything is setup and you can test out the app.
 
 * Run `npm run dev` in the terminal. App will run at `localhost:3000`
+
+ graph init --contract-name NftMarket --index-events --product subgraph-studio --from-contract 0x8D56523B320F3746e4ceD9c20CfAfD7F42E747FD 
