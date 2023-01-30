@@ -1,0 +1,6 @@
+
+query getTokenById($tokenId: String!){
+    tokenIsMinteds(where: {tokenId: $tokenId}){
+        tokenURI
+    }
+}

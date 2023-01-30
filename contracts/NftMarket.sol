@@ -61,6 +61,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         uint tokenId,
         address creator,
         string tokenURI,
+        string nftName,
         uint mintedAt
     );
 
@@ -113,6 +114,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return _ownedTokens[owner][index];
     }
 
+
     function getAllNftsOnSale() public view returns (NftItem[] memory) {
         uint allItemsCounts = totalSupply();
         uint currentIndex = 0;
@@ -132,7 +134,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
     }
 
 
-
     function getOwnedNfts() public view returns (NftItem[] memory) {
         uint ownedItemsCount = ERC721.balanceOf(msg.sender);
         NftItem[] memory items = new NftItem[](ownedItemsCount);
@@ -146,7 +147,12 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return items;
     }
 
-    function mintToken(string memory tokenURI, uint price, uint96 royalty) public payable returns (uint) {
+    function mintToken(
+        string memory tokenURI,
+        string memory nftName,
+        uint price,
+        uint96 royalty
+    ) public payable returns (uint) {
         require(!tokenURIExists(tokenURI), "Token URI already exists");
         require(msg.value == listingPrice, "Price must be equal to listing price");
         mintsPerAddress[msg.sender] += _tokenIds.current();
@@ -170,11 +176,9 @@ contract NftMarket is ERC721URIStorage, Ownable {
             _usedTokenURIs[tokenURI] = true;
         }
         uint mintedAt = block.timestamp;
-        emit TokenIsMinted(newTokenId, msg.sender, tokenURI, mintedAt);
+        emit TokenIsMinted(newTokenId, msg.sender, tokenURI,nftName, mintedAt);
         return newTokenId;
     }
-
-
 
     //interface for royalties
     function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool){

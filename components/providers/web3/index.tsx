@@ -3,7 +3,6 @@ import {createDefaultState, createWeb3State, loadContract, loadDBContract, Web3S
 import { ethers } from "ethers";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import { NftMarketContract } from "@_types/nftMarketContract";
-import {profileContract} from "../../../userDB/config";
 import {ProfileContract} from "@_types/profileContract";
 
 const pageReload = () => { window.location.reload(); }

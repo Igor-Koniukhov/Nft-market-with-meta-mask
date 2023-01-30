@@ -11,6 +11,7 @@
     "genProfileContractType": "abi-types-generator './userDB/abi/contracts/UserDb.json' --output='./types' --name=profileContract --provider=ethers_v5"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.5",
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.6",
     "@metamask/providers": "^8.1.1",
@@ -22,6 +23,7 @@
     "ethereumjs-util": "^7.1.4",
     "ethers": "^5.6.2",
     "form-data": "^4.0.0",
+    "graphql": "^16.6.0",
     "next": "12.1.4",
     "next-iron-session": "^4.2.0",
     "next-redux-wrapper": "^8.1.0",

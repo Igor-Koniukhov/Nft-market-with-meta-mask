@@ -11,6 +11,9 @@ import {useEthPrice} from "@hooks/useEthPrice";
 import axios from "axios";
 import {toast} from "react-toastify";
 import {ethers} from "ethers";
+import {getURIById} from "../queries/queries";
+
+
 
 const tabs = [
     {name: 'Your Collection', href: '#', current: true},
@@ -82,6 +85,16 @@ const Profile: NextPage = () => {
             console.error(e.message);
         }
     }
+
+
+
+
+
+    useEffect(() => {
+        getURIById("2")
+
+    }, []);
+
 
     const royaltyInfo = async () => {
         if (activeNft !== undefined) {

@@ -24,8 +24,6 @@ module.exports = {
           process.env.NEXT_PUBLIC_ALCHEMY_NFT
         ),
       network_id: 5,
-      gas: 5500000,
-      gasPrice: 20000000000,
       confirmations: 2,
       timeoutBlocks: 200
     }

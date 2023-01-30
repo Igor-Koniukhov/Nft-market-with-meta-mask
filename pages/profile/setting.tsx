@@ -5,9 +5,8 @@ import {ChangeEvent, useState} from 'react';
 import { BaseLayout } from '@ui'
 import {PinataRes, UserData} from '@_types/nft';
 import axios from 'axios';
-import { useWeb3 } from '@providers/web3';
 import { toast } from "react-toastify";
-import {useAccount, useNetwork, useProfile} from '@hooks/web3';
+import { useNetwork, useProfile} from '@hooks/web3';
 import { ExclamationIcon } from '@heroicons/react/solid';
 
 

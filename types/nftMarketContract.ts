@@ -57,16 +57,20 @@ export interface ContractCallOverrides {
 export type NftMarketContractEvents =
   | 'Approval'
   | 'ApprovalForAll'
+  | 'NftBought'
   | 'NftItemCreated'
   | 'OwnershipTransferred'
   | 'RoyaltyAmountSent'
+  | 'TokenIsMinted'
   | 'Transfer';
 export interface NftMarketContractEventsContext {
   Approval(...parameters: any): EventFilter;
   ApprovalForAll(...parameters: any): EventFilter;
+  NftBought(...parameters: any): EventFilter;
   NftItemCreated(...parameters: any): EventFilter;
   OwnershipTransferred(...parameters: any): EventFilter;
   RoyaltyAmountSent(...parameters: any): EventFilter;
+  TokenIsMinted(...parameters: any): EventFilter;
   Transfer(...parameters: any): EventFilter;
 }
 export type NftMarketContractMethodNames =
@@ -119,6 +123,14 @@ export interface ApprovalForAllEventEmittedResponse {
   operator: string;
   approved: boolean;
 }
+export interface NftBoughtEventEmittedResponse {
+  tokenId: BigNumberish;
+  price: BigNumberish;
+  royaltyAmount: BigNumberish;
+  previousOwner: string;
+  owner: string;
+  boughtAt: BigNumberish;
+}
 export interface NftItemCreatedEventEmittedResponse {
   tokenId: BigNumberish;
   price: BigNumberish;
@@ -134,6 +146,13 @@ export interface RoyaltyAmountSentEventEmittedResponse {
   receiver: string;
   tokenId: BigNumberish;
   royaltyAmount: BigNumberish;
+}
+export interface TokenIsMintedEventEmittedResponse {
+  tokenId: BigNumberish;
+  creator: string;
+  tokenURI: string;
+  nftName: string;
+  mintedAt: BigNumberish;
 }
 export interface TransferEventEmittedResponse {
   from: string;
@@ -462,11 +481,13 @@ export interface NftMarketContract {
    * StateMutability: payable
    * Type: function
    * @param tokenURI Type: string, Indexed: false
+   * @param nftName Type: string, Indexed: false
    * @param price Type: uint256, Indexed: false
    * @param royalty Type: uint96, Indexed: false
    */
   mintToken(
     tokenURI: string,
+    nftName: string,
     price: BigNumberish,
     royalty: BigNumberish,
     overrides?: ContractTransactionOverrides

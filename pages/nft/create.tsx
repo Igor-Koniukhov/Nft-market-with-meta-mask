@@ -131,6 +131,7 @@ const NftCreate: NextPage = () => {
     try {
       const tx = await contract?.mintToken(
         nftURI,
+        nftMeta.name,
         ethers.utils.parseEther(price),
           royalty,{
             value: ethers.utils.parseEther(0.025.toString())
