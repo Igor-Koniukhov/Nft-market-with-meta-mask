@@ -21,13 +21,10 @@ const [inputRequest, setRequest]=useState("")
     return (
         <div className="mt-5 md:col-span-2 md:mt-0">
             <form action="#" method="POST">
-
-
                 <div className="grid grid-cols-3 gap-6">
-
                     <div className="col-span-3 sm:col-span-2">
                         <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
-                            Search
+                            Search by NFT name
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm">
                         <span
@@ -37,9 +34,9 @@ const [inputRequest, setRequest]=useState("")
                             <input
                                 value={inputRequest}
                                 onChange={(e)=>setRequest(e.target.value)}
-                                type="text"
+                                type="search"
                                 name="search"
-                                id="search"
+                                id="search by NFT name"
                                 className="block w-full flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 placeholder="enter a request"
                             />

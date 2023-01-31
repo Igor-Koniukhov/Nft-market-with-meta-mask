@@ -33,6 +33,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
     Counters.Counter private _listedItems;
     Counters.Counter private _tokenIds;
 
+    Counters.Counter private _collectionId;
+
     mapping(string => bool) private _usedTokenURIs;
     mapping(uint => NftItem) private _idToNftItem;
 
@@ -42,12 +44,19 @@ contract NftMarket is ERC721URIStorage, Ownable {
     uint256[] private _allNfts;
     mapping(uint => uint) private _idToNftIndex;
 
-    event NftItemCreated (
+    event NFT (
         uint tokenId,
-        uint price,
+        string tokenURI,
+        string nftName,
         address creator,
+        address owner,
+        uint price,
+        uint96 royalty,
         bool isListed,
-        bool isSold
+        bool isSold,
+        uint collectionId,
+        uint networkId,
+        uint createdAt
     );
     event NftBought (
         uint tokenId,
@@ -57,16 +66,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
         address owner,
         uint boughtAt
     );
-    event TokenIsMinted (
-        uint tokenId,
+    event RoyaltyAmountSent(
         address creator,
-        string tokenURI,
-        string nftName,
-        uint mintedAt
-    );
-
-    event RoyaltyAmountSent (
-        address receiver,
         uint tokenId,
         uint royaltyAmount
     );
@@ -81,7 +82,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         require(tx.origin == msg.sender, "The caller is another contract");
         _;
     }
-
 
     function setListingPrice(uint newPrice) external onlyOwner {
         require(newPrice > 0, "Price must be at least 1 wei");
@@ -114,7 +114,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return _ownedTokens[owner][index];
     }
 
-
     function getAllNftsOnSale() public view returns (NftItem[] memory) {
         uint allItemsCounts = totalSupply();
         uint currentIndex = 0;
@@ -129,10 +128,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
                 currentIndex += 1;
             }
         }
-
         return items;
     }
-
 
     function getOwnedNfts() public view returns (NftItem[] memory) {
         uint ownedItemsCount = ERC721.balanceOf(msg.sender);
@@ -143,7 +140,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
             NftItem storage item = _idToNftItem[tokenId];
             items[i] = item;
         }
-
         return items;
     }
 
@@ -151,7 +147,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
         string memory tokenURI,
         string memory nftName,
         uint price,
-        uint96 royalty
+        uint96 royalty,
+        uint networkId
     ) public payable returns (uint) {
         require(!tokenURIExists(tokenURI), "Token URI already exists");
         require(msg.value == listingPrice, "Price must be equal to listing price");
@@ -162,7 +159,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         uint newTokenId = _tokenIds.current();
         _idToNftItem[newTokenId].isSold = false;
         if (royalty != 0) {
-
             _safeMint(msg.sender, newTokenId);
             _setTokenURI(newTokenId, tokenURI);
             _createNftItem(newTokenId, price);
@@ -176,7 +172,21 @@ contract NftMarket is ERC721URIStorage, Ownable {
             _usedTokenURIs[tokenURI] = true;
         }
         uint mintedAt = block.timestamp;
-        emit TokenIsMinted(newTokenId, msg.sender, tokenURI,nftName, mintedAt);
+        emit NFT(
+            newTokenId,
+            tokenURI,
+            nftName,
+            msg.sender,
+            msg.sender,
+            price,
+            royalty,
+            true,
+            false,
+            _collectionId,
+            networkId,
+            mintedAt
+        );
+
         return newTokenId;
     }
 
@@ -263,7 +273,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _listedItems.increment();
     }
 
-
     function removeNftFromSale(uint tokenId) public {
         require(ERC721.ownerOf(tokenId) == msg.sender, "You are not owner of this nft");
         require(_idToNftItem[tokenId].isListed == true, "Item is already removed from sale");
@@ -296,7 +305,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
             true,
             false
         );
-        emit NftItemCreated(tokenId, price, msg.sender, true, false);
     }
 
     function _beforeTokenTransfer(

@@ -44,3 +44,28 @@ export const getTokenByName = async (name: string)=>{
             console.log('Error fetching data: ', err)
         })
 }
+
+export const getTokenByPriceRange = async (param1: string, param2: string)=>{
+    console.log(param1, param2, " this")
+    const query = `
+    query GetTokenByPriceRange($price1: BigInt!,$price2: BigInt!){
+    
+   nftItemCreateds(where: {price_gt: $price1, price_lt: $price2}) {
+    id
+    price
+    tokenId
+  }
+}`
+    client
+        .query({
+            query: gql(query),
+            variables: {
+                price1: param1,
+                price2: param2
+            },
+        })
+        .then((data) => console.log('Subgraph data: ', data.data))
+        .catch((err) => {
+            console.log('Error fetching data: ', err)
+        })
+}
