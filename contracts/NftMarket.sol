@@ -45,7 +45,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
     mapping(uint => uint) private _idToNftIndex;
 
     event NFT (
-        uint tokenId,
+        uint  indexed tokenId,
         string tokenURI,
         string nftName,
         address creator,
@@ -54,12 +54,12 @@ contract NftMarket is ERC721URIStorage, Ownable {
         uint96 royalty,
         bool isListed,
         bool isSold,
-        uint collectionId,
+        uint indexed collectionId,
         uint networkId,
         uint createdAt
     );
     event NftBought (
-        uint tokenId,
+        uint indexed tokenId,
         uint price,
         uint royaltyAmount,
         address previousOwner,
@@ -68,7 +68,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
     );
     event RoyaltyAmountSent(
         address creator,
-        uint tokenId,
+        uint indexed tokenId,
         uint royaltyAmount
     );
 
@@ -182,7 +182,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
             royalty,
             true,
             false,
-            _collectionId,
+            _collectionId.current(),
             networkId,
             mintedAt
         );

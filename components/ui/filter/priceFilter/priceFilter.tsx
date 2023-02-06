@@ -27,8 +27,8 @@ const Pricefilter: FunctionComponent<Intput> = (
 
     return (
 
-        <div className="mt-5 md:col-span-2 md:mt-0">
-            <div className="grid grid-cols-3 gap-6">
+        <div className="mt-2 md:col-span-2 md:mt-0">
+            <div className="grid grid-cols-3 ">
 
                 <div className="col-span-3 sm:col-span-2">
                     <label htmlFor="price">{label}</label>
@@ -40,10 +40,9 @@ const Pricefilter: FunctionComponent<Intput> = (
                         name="name"
                         type="range"
                         onInput={handleInput}/>
-
                 </div>
             </div>
-            <output> Value: {ethers.utils.formatEther(price)}</output>
+            <output> Value: {ethers.utils.formatEther(price)} Eth</output>
         </div>
 
 

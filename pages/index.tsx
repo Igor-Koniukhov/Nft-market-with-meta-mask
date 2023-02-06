@@ -5,7 +5,7 @@ import {BaseLayout, NftList, Search} from '@ui';
 import {useNetwork} from '@hooks/web3';
 import {ExclamationIcon} from '@heroicons/react/solid';
 import Pricefilter from "@ui/filter/priceFilter/priceFilter";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {getTokenByPriceRange} from "../queries/queries";
 
 const Home: NextPage = () => {
@@ -25,12 +25,12 @@ const Home: NextPage = () => {
 
 
 
+
     return (
         <BaseLayout>
+
             <Search/>
             <div className="flex">
-
-
             <div>
                 <Pricefilter
                     label="From"

@@ -57,20 +57,18 @@ export interface ContractCallOverrides {
 export type NftMarketContractEvents =
   | 'Approval'
   | 'ApprovalForAll'
+  | 'NFT'
   | 'NftBought'
-  | 'NftItemCreated'
   | 'OwnershipTransferred'
   | 'RoyaltyAmountSent'
-  | 'TokenIsMinted'
   | 'Transfer';
 export interface NftMarketContractEventsContext {
   Approval(...parameters: any): EventFilter;
   ApprovalForAll(...parameters: any): EventFilter;
+  NFT(...parameters: any): EventFilter;
   NftBought(...parameters: any): EventFilter;
-  NftItemCreated(...parameters: any): EventFilter;
   OwnershipTransferred(...parameters: any): EventFilter;
   RoyaltyAmountSent(...parameters: any): EventFilter;
-  TokenIsMinted(...parameters: any): EventFilter;
   Transfer(...parameters: any): EventFilter;
 }
 export type NftMarketContractMethodNames =
@@ -123,6 +121,20 @@ export interface ApprovalForAllEventEmittedResponse {
   operator: string;
   approved: boolean;
 }
+export interface NFTEventEmittedResponse {
+  tokenId: BigNumberish;
+  tokenURI: string;
+  nftName: string;
+  creator: string;
+  owner: string;
+  price: BigNumberish;
+  royalty: BigNumberish;
+  isListed: boolean;
+  isSold: boolean;
+  collectionId: BigNumberish;
+  networkId: BigNumberish;
+  createdAt: BigNumberish;
+}
 export interface NftBoughtEventEmittedResponse {
   tokenId: BigNumberish;
   price: BigNumberish;
@@ -131,28 +143,14 @@ export interface NftBoughtEventEmittedResponse {
   owner: string;
   boughtAt: BigNumberish;
 }
-export interface NftItemCreatedEventEmittedResponse {
-  tokenId: BigNumberish;
-  price: BigNumberish;
-  creator: string;
-  isListed: boolean;
-  isSold: boolean;
-}
 export interface OwnershipTransferredEventEmittedResponse {
   previousOwner: string;
   newOwner: string;
 }
 export interface RoyaltyAmountSentEventEmittedResponse {
-  receiver: string;
+  creator: string;
   tokenId: BigNumberish;
   royaltyAmount: BigNumberish;
-}
-export interface TokenIsMintedEventEmittedResponse {
-  tokenId: BigNumberish;
-  creator: string;
-  tokenURI: string;
-  nftName: string;
-  mintedAt: BigNumberish;
 }
 export interface TransferEventEmittedResponse {
   from: string;
@@ -185,6 +183,8 @@ export interface RoyaltyinfoResponse {
   1: BigNumber;
 }
 export interface NftMarketContract {
+  // @ts-ignore
+  on(arg0: string, arg1: (tokenId: BigNumberish, tokenURI: string, nftName: string, creator: string, owner: string, price: BigNumberish, royalty: BigNumberish, isListed: boolean, isSold: boolean, collectionId: BigNumberish, networkId: BigNumberish, createdAt: BigNumberish) => void);
   /**
    * Payable: false
    * Constant: false
@@ -484,12 +484,14 @@ export interface NftMarketContract {
    * @param nftName Type: string, Indexed: false
    * @param price Type: uint256, Indexed: false
    * @param royalty Type: uint96, Indexed: false
+   * @param networkId Type: uint256, Indexed: false
    */
   mintToken(
     tokenURI: string,
     nftName: string,
     price: BigNumberish,
     royalty: BigNumberish,
+    networkId: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**

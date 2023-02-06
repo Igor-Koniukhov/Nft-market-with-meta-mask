@@ -4,7 +4,7 @@ import { SWRResponse } from "swr";
 import { NftMarketContract } from "./nftMarketContract";
 import {ProfileContract} from "@_types/profileContract";
 
-
+export const urlPinata = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/`
 export type Web3Dependencies = {
   provider: providers.Web3Provider;
   contract: NftMarketContract;
