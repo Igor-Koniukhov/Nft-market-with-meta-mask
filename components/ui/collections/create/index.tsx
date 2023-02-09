@@ -134,9 +134,10 @@ const CollectionCreate: FunctionComponent = () => {
         }
     }
     const getSignedData = async () => {
-        const messageToSign = await axios.get("/api/verify", {params: {address: collectionAddress as string}});
         const accounts = await ethereum?.request({method: "eth_requestAccounts"}) as string[];
         const account = accounts[0];
+        const messageToSign = await axios.get("/api/verify-collection", {params: {address: account as string}});
+
 
         const signedData = await ethereum?.request({
             method: "personal_sign",
