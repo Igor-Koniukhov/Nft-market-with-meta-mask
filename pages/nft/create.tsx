@@ -2,7 +2,7 @@
 
 import type {NextPage} from 'next'
 import {ChangeEvent, useState} from 'react';
-import {BaseLayout} from '@ui'
+import {BaseLayout, CollectionCreate} from '@ui'
 import {Switch} from '@headlessui/react'
 import Link from 'next/link'
 import {NftMeta, PinataRes} from '@_types/nft';
@@ -12,16 +12,18 @@ import {BigNumberish, ethers} from 'ethers';
 import {toast} from "react-toastify";
 import {useNetwork} from '@hooks/web3';
 import {ExclamationIcon} from '@heroicons/react/solid';
-import {NFTEventEmittedResponse} from "@_types/nftMarketContract";
+import {useSelector} from "react-redux";
+import {selectAddress} from "../../store/slices/collectionSlice";
 
 
 const NftCreate: NextPage = () => {
-    const {ethereum, contract} = useWeb3();
+    const {ethereum, contract, factory} = useWeb3();
     const {network} = useNetwork();
     const [nftURI, setNftURI] = useState("");
     const [price, setPrice] = useState("");
     const [hasURI, setHasURI] = useState(false);
     const [royalty, setRoyalty] = useState(5)
+    const collectionAddress = useSelector(selectAddress)
     const [nftMeta, setNftMeta] = useState<NftMeta>({
         name: "",
         description: "",
@@ -32,8 +34,9 @@ const NftCreate: NextPage = () => {
         ]
     });
 
+
     const getSignedData = async () => {
-        const messageToSign = await axios.get("/api/verify");
+        const messageToSign = await axios.get("/api/verify", {params: {address: collectionAddress as string}});
         const accounts = await ethereum?.request({method: "eth_requestAccounts"}) as string[];
         const account = accounts[0];
 
@@ -88,6 +91,7 @@ const NftCreate: NextPage = () => {
         const {name, value} = e.target;
         setNftMeta({...nftMeta, [name]: value});
     }
+
 
     const handleAttributeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -336,6 +340,9 @@ const NftCreate: NextPage = () => {
                             </div>
                         </div>
                         <div className="mt-5 md:mt-0 md:col-span-2">
+
+                            <CollectionCreate/>
+
                             <form>
                                 <div className="shadow sm:rounded-md sm:overflow-hidden">
                                     <div className="px-4 py-5 bg-white space-y-6 sm:p-6">

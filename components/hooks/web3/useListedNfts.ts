@@ -15,7 +15,7 @@ export type UseListedNftsHook = ReturnType<ListedNftsHookFactory>
 
 export const hookFactory: ListedNftsHookFactory = ({contract}) => () => {
   const {data, ...swr} = useSWR(
-    contract ? "web3/useListedNfts" : null,
+    contract ? `web3/useListedNfts/${contract.address}` : null,
     async () => {
       const nfts = [] as Nft[];
       const coreNfts = await contract!.getAllNftsOnSale();
@@ -34,9 +34,9 @@ export const hookFactory: ListedNftsHookFactory = ({contract}) => () => {
           meta
         })
       }
-      
+
       return nfts;
-    }
+    },
   )
 
   const _contract = contract;

@@ -25,6 +25,7 @@ export const createDefaultState = () => {
   return {
     ethereum: null,
     provider: null,
+    factory: null,
     contract: null,
     profileContract: null,
     isLoading: true,
@@ -33,23 +34,24 @@ export const createDefaultState = () => {
 }
 
 export const createWeb3State = ({
-  ethereum, provider, contract, profileContract, isLoading
+  ethereum, provider, factory, contract, profileContract, isLoading
 }: Web3Dependencies) => {
   return {
     ethereum,
     provider,
+    factory,
     contract,
     profileContract,
     isLoading,
-    hooks: setupHooks({ethereum, provider, contract, profileContract, isLoading})
+    hooks: setupHooks({ethereum, provider, factory, contract, profileContract, isLoading})
   }
 }
 
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export const loadContract = async (
+export const loadFactoryContract = async (
   name: string,  // NftMarket
-  provider: providers.Web3Provider
+  provider: providers.Web3Provider,
 ): Promise<Contract> => {
   if (!NETWORK_ID) {
     return Promise.reject("Network ID is not defined!");
@@ -63,6 +65,25 @@ export const loadContract = async (
       Artifact.networks[NETWORK_ID].address,
       Artifact.abi,
       provider
+    )
+
+    return contract;
+  } else {
+    return Promise.reject(`Contract: [${name}] cannot be loaded!`);
+  }
+}
+export const loadContract = async (
+    name: string,  // NftMarket
+    provider: providers.Web3Provider,
+    address: string
+): Promise<Contract> => {
+  const res = await fetch(`/contracts/${name}.json`);
+  const Artifact = await res.json();
+  if (address) {
+    const contract = new ethers.Contract(
+        address,
+        Artifact.abi,
+        provider
     )
 
     return contract;

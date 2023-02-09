@@ -1,15 +1,23 @@
 /* eslint-disable @next/next/no-img-element */
 
 import type {NextPage} from 'next';
-import {BaseLayout, NftList, Search} from '@ui';
-import {useNetwork} from '@hooks/web3';
+import {BaseLayout, CollectionsList, NftList, Search} from '@ui';
+import {useListedCollections, useNetwork} from '@hooks/web3';
 import {ExclamationIcon} from '@heroicons/react/solid';
 import Pricefilter from "@ui/filter/priceFilter/priceFilter";
 import {useState} from "react";
 import {getTokenByPriceRange} from "../queries/queries";
 
+import {Collection} from "@_types/nft";
+
+
+
 const Home: NextPage = () => {
     const {network} = useNetwork();
+   const {collections}=useListedCollections()
+
+
+
     const [priceFrom, setPriceFrom] = useState('25000000000000000');
     const [priceTo, setPriceTo] = useState('1000000000000000000');
 
@@ -24,10 +32,11 @@ const Home: NextPage = () => {
     }
 
 
-
-
     return (
         <BaseLayout>
+            <CollectionsList
+            collections={collections.data as Collection[]}
+            />
 
             <Search/>
             <div className="flex">

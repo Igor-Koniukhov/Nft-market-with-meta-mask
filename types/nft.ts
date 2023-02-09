@@ -12,6 +12,12 @@ export type NftMeta = {
   image: string;
   attributes: NftAttribute[];
 }
+export type CollectionMeta={
+  cName: string;
+  cSymbol: string;
+  cDescription: string;
+  image: string;
+}
 
 export type UserData ={
   userName: string;
@@ -30,6 +36,15 @@ export type NftCore = {
   price: number;
   creator: string;
   isListed: boolean
+}
+export type Collection = {
+  token: string;
+  collectionId: number;
+  creator: string;
+  symbol: string;
+  name: string;
+  isPublished: boolean;
+
 }
 
 export type Nft = {

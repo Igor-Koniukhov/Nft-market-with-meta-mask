@@ -36,6 +36,14 @@ export const useListedNfts = () => {
     nfts: swrRes
   }
 }
+export const useListedCollections = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useListedCollections();
+
+  return {
+    collections: swrRes
+  }
+}
 
 export const useOwnedNfts = () => {
   const hooks = useHooks();

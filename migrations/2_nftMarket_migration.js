@@ -1,5 +1,5 @@
-const NftMarket = artifacts.require("NftMarket");
+const Factory = artifacts.require("Factory");
 
 module.exports = function (deployer) {
-  deployer.deploy(NftMarket);
+  deployer.deploy(Factory);
 };
