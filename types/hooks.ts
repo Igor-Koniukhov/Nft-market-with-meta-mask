@@ -6,6 +6,7 @@ import {ProfileContract} from "@_types/profileContract";
 import {FactoryContract} from "@_types/FactoryContract";
 
 export const urlPinata = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/`
+
 export type Web3Dependencies = {
   provider: providers.Web3Provider;
   factory: FactoryContract;

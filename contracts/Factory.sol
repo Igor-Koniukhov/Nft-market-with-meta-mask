@@ -91,12 +91,12 @@ contract Factory {
     }
 
 
-    function getOwnedCollections(address creator) public view returns (CollectionNft[] memory){
-        require(_ownedCollections[creator].length > 0, "No collections.");
+    function getOwnedCollections() public view returns (CollectionNft[] memory){
+        require(_ownedCollections[msg.sender].length > 0, "No collections.");
         uint currentIndex = 0;
-        CollectionNft[] memory ownedCollections = new CollectionNft[](_ownedCollections[creator].length);
-        for (uint i = 0; i < _ownedCollections[creator].length; i++) {
-            CollectionNft storage collection = _idToCollection[_ownedCollections[creator][i]];
+        CollectionNft[] memory ownedCollections = new CollectionNft[](_ownedCollections[msg.sender].length);
+        for (uint i = 0; i < _ownedCollections[msg.sender].length; i++) {
+            CollectionNft storage collection = _idToCollection[_ownedCollections[msg.sender][i]];
             ownedCollections[currentIndex] = collection;
             currentIndex++;
         }

@@ -219,10 +219,8 @@ export interface FactoryContract {
    * Constant: true
    * StateMutability: view
    * Type: function
-   * @param creator Type: address, Indexed: false
    */
   getOwnedCollections(
-    creator: string,
     overrides?: ContractCallOverrides
   ): Promise<CollectionnftResponse[]>;
 }

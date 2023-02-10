@@ -8,7 +8,7 @@ import Walletbar from './Walletbar';
 
 const navigation = [
   { name: 'Marketplace', href: '/', current: true },
-  { name: 'Create', href: '/nft/create', current: false }
+  { name: 'Create', href: '/collections/create', current: false }
 ]
 
 function classNames(...classes: string[]) {

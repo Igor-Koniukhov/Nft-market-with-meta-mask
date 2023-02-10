@@ -566,9 +566,11 @@ export interface NftMarketContract {
    * StateMutability: payable
    * Type: function
    * @param tokenId Type: uint256, Indexed: false
+   * @param newPrice Type: uint256, Indexed: false
    */
   placeNftOnSale(
     tokenId: BigNumberish,
+    newPrice: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**

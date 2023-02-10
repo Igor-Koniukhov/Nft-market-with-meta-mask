@@ -19,6 +19,7 @@ export const hookFactory: OwnedNftsHookFactory = ({contract}) => () => {
         async () => {
             const nfts = [] as Nft[];
             const coreNfts = await contract!.getOwnedNfts();
+            console.log(contract, " from OwnedNftHook")
 
             for (let i = 0; i < coreNfts.length; i++) {
                 const item = coreNfts[i];
@@ -41,6 +42,7 @@ export const hookFactory: OwnedNftsHookFactory = ({contract}) => () => {
 
     const _contract = contract;
     const listNft = useCallback(async (tokenId: number, price: number) => {
+        console.log(tokenId, price)
         try {
             const result = await _contract!.placeNftOnSale(
                 tokenId,

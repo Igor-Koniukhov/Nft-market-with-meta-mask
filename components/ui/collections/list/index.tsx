@@ -8,10 +8,11 @@ import {useDispatch} from "react-redux";
 import {setAddress} from "../../../../store/slices/collectionSlice";
 
 type CollectionResponse ={
+    path: string,
     collections: Collection[]
 }
-const List:FunctionComponent<CollectionResponse> = ({collections}) =>{
-
+const List:FunctionComponent<CollectionResponse> = ({collections, path}) =>{
+    console.log(path, " path")
     const dispatch = useDispatch()
 
     const handleNftCollection = (address: string)=>{
@@ -24,36 +25,36 @@ const List:FunctionComponent<CollectionResponse> = ({collections}) =>{
         { collections!.map(collection =>
                 <div
                     key={collection.collectionId}
-                    className="bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-                    <div className="flex h-full">
-                        <div className="flex h-full">
-                            <Image
-                                className="object-cover"
-                                src="/images/pumpkin.png"
-                                layout="fixed"
-                                width="200"
-                                height="230"
-                                alt={collection.name}
-                            />
-                        </div>
-                        <div className="p-8">
+                    className="bg-white rounded-xl shadow-md  flex">
+                    <div>
+                        <img
+                            style={{maxWidth: "200px"}}
+                            className="object-cover"
+                            src={collection.image}
+                            width='300'
+                            height='250'
+                            alt={collection.name}
+                        />
+                    </div>
+
+                        <div className="p-2">
                             <div
-                                className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+                                className="uppercase  text-sm text-indigo-500 font-semibold">
                                 {collection.name}
                             </div>
-                            <Link href={`/collections/${collection.token}`}>
+                            <Link href={`/collections/${path}/${collection.token}`}>
                                 <a
-                                    className="block mt-1 text-lg leading-tight font-medium text-black hover:underline">
+                                    className=" mt-1 text-lg leading-tight font-medium text-black hover:underline">
                                     {collection.name}
                                 </a>
                             </Link>
                             <button type="button" onClick={()=>handleNftCollection(collection.token)}>{collection.name}</button>
-                            <p
-                                className="mt-2 text-gray-500">
-                                description
+                            <p style={{overflowWrap: "break-word", hyphens: "auto"}}
+                                className="mt-2 text-gray-500 flex text-justify">
+                               Description: {collection.description}
                             </p>
                         </div>
-                    </div>
+
                 </div>
             )}
         </section>

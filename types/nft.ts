@@ -43,6 +43,8 @@ export type Collection = {
   creator: string;
   symbol: string;
   name: string;
+  image: string;
+  description: string;
   isPublished: boolean;
 
 }
