@@ -3,17 +3,17 @@
 import { v4 as uuidv4 } from "uuid";
 import { Session } from "next-iron-session";
 import { NextApiRequest, NextApiResponse } from "next";
-import { withSession, contractAddress, addressCheckMiddleware, pinataApiKey, pinataSecretApiKey } from "./utils";
-import { NftMeta } from "@_types/nft";
+import { withSession, addressCheckMiddleware, pinataApiKey, pinataSecretApiKey } from "./utils";
+import {CollectionMeta, NftMeta} from "@_types/nft";
 import axios from "axios";
 
 export default withSession(async (req: NextApiRequest & {session: Session}, res: NextApiResponse) => {
   if (req.method === "POST") {
     try {
       const {body} = req;
-      const nft = body.nft as NftMeta
+      const collectionMeta = body.collectionMeta as CollectionMeta
 
-      if (!nft.name || !nft.description || !nft.attributes) {
+      if (!collectionMeta.cName || !collectionMeta.cSymbol || !collectionMeta.cDescription || !collectionMeta.image) {
         return res.status(422).send({message: "Some of the form data are missing!"});
       }
 
@@ -23,7 +23,7 @@ export default withSession(async (req: NextApiRequest & {session: Session}, res:
         pinataMetadata: {
           name: uuidv4()
         },
-        pinataContent: nft
+        pinataContent: collectionMeta
       }, {
         headers: {
           pinata_api_key: pinataApiKey,
@@ -38,6 +38,7 @@ export default withSession(async (req: NextApiRequest & {session: Session}, res:
   } else if (req.method === "GET") {
     try {
       let collection = `${req.query.address}`
+      console.log(collection, " collection")
       const message = { collection, id: uuidv4() };
       req.session.set("message-session", message);
       await req.session.save();

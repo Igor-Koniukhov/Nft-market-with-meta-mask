@@ -60,7 +60,6 @@ export type NftMarketContractEvents =
   | 'NFT'
   | 'NftBought'
   | 'OwnershipTransferred'
-  | 'RoyaltyAmountSent'
   | 'Transfer';
 export interface NftMarketContractEventsContext {
   Approval(...parameters: any): EventFilter;
@@ -68,7 +67,6 @@ export interface NftMarketContractEventsContext {
   NFT(...parameters: any): EventFilter;
   NftBought(...parameters: any): EventFilter;
   OwnershipTransferred(...parameters: any): EventFilter;
-  RoyaltyAmountSent(...parameters: any): EventFilter;
   Transfer(...parameters: any): EventFilter;
 }
 export type NftMarketContractMethodNames =
@@ -79,7 +77,6 @@ export type NftMarketContractMethodNames =
   | 'getApproved'
   | 'isApprovedForAll'
   | 'listingPrice'
-  | 'mintsPerAddress'
   | 'name'
   | 'owner'
   | 'ownerOf'
@@ -87,6 +84,7 @@ export type NftMarketContractMethodNames =
   | 'safeTransferFrom'
   | 'safeTransferFrom'
   | 'setApprovalForAll'
+  | 'supportsInterface'
   | 'symbol'
   | 'tokenURI'
   | 'transferFrom'
@@ -101,7 +99,6 @@ export type NftMarketContractMethodNames =
   | 'getAllNftsOnSale'
   | 'getOwnedNfts'
   | 'mintToken'
-  | 'supportsInterface'
   | 'setRoyalties'
   | 'royaltyInfo'
   | 'getRoyaltyPerTokenId'
@@ -131,9 +128,7 @@ export interface NFTEventEmittedResponse {
   royalty: BigNumberish;
   isListed: boolean;
   isSold: boolean;
-  collectionId: BigNumberish;
   networkId: BigNumberish;
-  createdAt: BigNumberish;
 }
 export interface NftBoughtEventEmittedResponse {
   tokenId: BigNumberish;
@@ -141,16 +136,10 @@ export interface NftBoughtEventEmittedResponse {
   royaltyAmount: BigNumberish;
   previousOwner: string;
   owner: string;
-  boughtAt: BigNumberish;
 }
 export interface OwnershipTransferredEventEmittedResponse {
   previousOwner: string;
   newOwner: string;
-}
-export interface RoyaltyAmountSentEventEmittedResponse {
-  creator: string;
-  tokenId: BigNumberish;
-  royaltyAmount: BigNumberish;
 }
 export interface TransferEventEmittedResponse {
   from: string;
@@ -183,15 +172,20 @@ export interface RoyaltyinfoResponse {
   1: BigNumber;
 }
 export interface NftMarketContract {
-  // @ts-ignore
   on(arg0: string, arg1: (tokenId: BigNumberish, tokenURI: string, nftName: string, creator: string, owner: string, price: BigNumberish, royalty: BigNumberish, isListed: boolean, isSold: boolean, collectionId: BigNumberish, networkId: BigNumberish, createdAt: BigNumberish) => void);
   /**
    * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: constructor
+   * @param TokenName Type: string, Indexed: false
+   * @param TokenSymbol Type: string, Indexed: false
    */
-  'new'(overrides?: ContractTransactionOverrides): Promise<ContractTransaction>;
+  'new'(
+    TokenName: string,
+    TokenSymbol: string,
+    overrides?: ContractTransactionOverrides
+  ): Promise<ContractTransaction>;
   /**
    * Payable: false
    * Constant: false
@@ -254,17 +248,6 @@ export interface NftMarketContract {
    * Type: function
    */
   listingPrice(overrides?: ContractCallOverrides): Promise<BigNumber>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param parameter0 Type: address, Indexed: false
-   */
-  mintsPerAddress(
-    parameter0: string,
-    overrides?: ContractCallOverrides
-  ): Promise<BigNumber>;
   /**
    * Payable: false
    * Constant: true
@@ -344,6 +327,17 @@ export interface NftMarketContract {
     approved: boolean,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param interfaceId Type: bytes4, Indexed: false
+   */
+  supportsInterface(
+    interfaceId: Arrayish,
+    overrides?: ContractCallOverrides
+  ): Promise<boolean>;
   /**
    * Payable: false
    * Constant: true
@@ -494,17 +488,6 @@ export interface NftMarketContract {
     networkId: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param interfaceId Type: bytes4, Indexed: false
-   */
-  supportsInterface(
-    interfaceId: Arrayish,
-    overrides?: ContractCallOverrides
-  ): Promise<boolean>;
   /**
    * Payable: false
    * Constant: false

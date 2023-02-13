@@ -87,9 +87,6 @@ const Profile: NextPage = () => {
     }
 
 
-
-
-
     useEffect(() => {
         getURIById("2")
 
@@ -128,14 +125,12 @@ const Profile: NextPage = () => {
                 setCollectionSymbol(data)
             )
         }
-        console.log(collectionName)
 
     }, [activeNft])
 
     useEffect(() => {
         if (nfts.data && nfts.data.length > 0) {
             setActiveNft(nfts.data[0]);
-
         }
 
         return () => setActiveNft(undefined)
@@ -152,8 +147,6 @@ const Profile: NextPage = () => {
                     }
                 ).then(() => setIsVisiblePriceInput(false))
             )
-
-
         }
     }
     return (

@@ -18,7 +18,7 @@ module.exports = {
     },
 
     goerly: {
-      provider: () => 
+      provider: () =>
         new HDWalletProvider(
          process.env.MNEMONIC,
           process.env.NEXT_PUBLIC_ALCHEMY_NFT
@@ -30,10 +30,12 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "0.8.13",
-      optimizer: {
-        enabled: true,
-        runs: 200
+      version: "0.8.1",
+      settings:{
+        optimizer: {
+          enabled: true,
+          runs: 200
+        }
       }
     }
   },

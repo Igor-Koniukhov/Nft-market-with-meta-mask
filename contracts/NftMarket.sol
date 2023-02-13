@@ -33,8 +33,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
     Counters.Counter private _listedItems;
     Counters.Counter private _tokenIds;
 
-    Counters.Counter private _collectionId;
-
     mapping(string => bool) private _usedTokenURIs;
     mapping(uint => NftItem) private _idToNftItem;
 
@@ -46,7 +44,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
 
     event NFT (
         uint  indexed tokenId,
-        string tokenURI,
+        string indexed tokenURI,
         string nftName,
         address creator,
         address owner,
@@ -54,37 +52,21 @@ contract NftMarket is ERC721URIStorage, Ownable {
         uint96 royalty,
         bool isListed,
         bool isSold,
-        uint indexed collectionId,
-        uint networkId,
-        uint createdAt
+        uint networkId
     );
     event NftBought (
         uint indexed tokenId,
         uint price,
         uint royaltyAmount,
         address previousOwner,
-        address owner,
-        uint boughtAt
-    );
-    event RoyaltyAmountSent(
-        address creator,
-        uint indexed tokenId,
-        uint royaltyAmount
+        address owner
     );
 
-    //amount of mints that each address has executed.
-    mapping(address => uint256) public mintsPerAddress;
 
-    constructor() ERC721("PumpkinNFT", "PNFT") {}
-
-    //ensure that modified function cannot be called by another contract
-    modifier callerIsUser() {
-        require(tx.origin == msg.sender, "The caller is another contract");
-        _;
-    }
+    constructor(string memory TokenName, string memory TokenSymbol) ERC721(TokenName, TokenSymbol) {}
 
     function setListingPrice(uint newPrice) external onlyOwner {
-        require(newPrice > 0, "Price must be at least 1 wei");
+        require(newPrice > 0, "!< 1 wei");
         listingPrice = newPrice;
     }
 
@@ -105,12 +87,12 @@ contract NftMarket is ERC721URIStorage, Ownable {
     }
 
     function tokenByIndex(uint index) public view returns (uint) {
-        require(index < totalSupply(), "Index out of bounds");
+        require(index < totalSupply(), "Inx out");
         return _allNfts[index];
     }
 
     function tokenOfOwnerByIndex(address owner, uint index) public view returns (uint) {
-        require(index < ERC721.balanceOf(owner), "Index out of bounds");
+        require(index < ERC721.balanceOf(owner), "Inx out");
         return _ownedTokens[owner][index];
     }
 
@@ -150,28 +132,20 @@ contract NftMarket is ERC721URIStorage, Ownable {
         uint96 royalty,
         uint networkId
     ) public payable returns (uint) {
-        require(!tokenURIExists(tokenURI), "Token URI already exists");
-        require(msg.value == listingPrice, "Price must be equal to listing price");
-        mintsPerAddress[msg.sender] += _tokenIds.current();
+        require(!tokenURIExists(tokenURI), "URI exists");
+        require(msg.value == listingPrice, "Price not eq listing price");
         _tokenIds.increment();
         _listedItems.increment();
 
         uint newTokenId = _tokenIds.current();
         _idToNftItem[newTokenId].isSold = false;
-        if (royalty != 0) {
-            _safeMint(msg.sender, newTokenId);
-            _setTokenURI(newTokenId, tokenURI);
-            _createNftItem(newTokenId, price);
-            setRoyalties(msg.sender, royalty, newTokenId);
-            _usedTokenURIs[tokenURI] = true;
 
-        } else {
-            _safeMint(msg.sender, newTokenId);
-            _setTokenURI(newTokenId, tokenURI);
-            _createNftItem(newTokenId, price);
-            _usedTokenURIs[tokenURI] = true;
-        }
-        uint mintedAt = block.timestamp;
+        _safeMint(msg.sender, newTokenId);
+        _setTokenURI(newTokenId, tokenURI);
+        _createNft(newTokenId, price);
+        setRoyalties(msg.sender, royalty, newTokenId);
+        _usedTokenURIs[tokenURI] = true;
+
         emit NFT(
             newTokenId,
             tokenURI,
@@ -182,17 +156,10 @@ contract NftMarket is ERC721URIStorage, Ownable {
             royalty,
             true,
             false,
-            _collectionId.current(),
-            networkId,
-            mintedAt
+            networkId
         );
 
         return newTokenId;
-    }
-
-    //interface for royalties
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool){
-        return interfaceId == _INTERFACE_ID_ERC2981 || super.supportsInterface(interfaceId);
     }
 
     function setRoyalties(address recipient, uint256 value, uint256 tokenId) public {
@@ -207,17 +174,13 @@ contract NftMarket is ERC721URIStorage, Ownable {
         royaltyAmount = (value * royalties.amount) / 100;
     }
 
+
     function getRoyaltyPerTokenId(uint256 tokenId) public view returns (RoyaltyInfo memory){
         return royaltyPerTokenId[tokenId];
     }
 
     function changeRoyaltyPerTokenId(uint256 tokenId, uint96 royalty) public {
         royaltyPerTokenId[tokenId].amount = royalty;
-    }
-
-    //fallback receive function
-    receive() external payable {
-        revert();
     }
 
     function _sentRoyaltyAmount(address creator, uint256 amount) private {
@@ -229,8 +192,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
     ) public payable {
         uint price = _idToNftItem[tokenId].price;
         address owner = ERC721.ownerOf(tokenId);
-        require(msg.sender != owner, "You already own this NFT");
-        require(msg.value == price, "Please submit the asking price");
+        require(msg.sender != owner, "Your's");
+        require(msg.value == price, "value != price");
 
         RoyaltyInfo memory royalties = royaltyPerTokenId[tokenId];
         address creator = royalties.recipient;
@@ -240,7 +203,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         if (_idToNftItem[tokenId].isSold) {
             payable(owner).transfer(msg.value - royaltyAmount);
             _sentRoyaltyAmount(creator, royaltyAmount);
-            emit RoyaltyAmountSent(creator, tokenId, royaltyAmount);
         } else {
             uint priceWithRoyalty = _idToNftItem[tokenId].price + royaltyAmount;
             _idToNftItem[tokenId].price = priceWithRoyalty;
@@ -250,17 +212,15 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _listedItems.decrement();
         _idToNftItem[tokenId].isListed = false;
         _idToNftItem[tokenId].isSold = true;
-        uint boughtAt = block.timestamp;
 
-        emit NftBought(tokenId, msg.value, royaltyAmount, owner, msg.sender, boughtAt);
+        emit NftBought(tokenId, msg.value, royaltyAmount, owner, msg.sender);
     }
 
-    //Withdraw money in contract to Owner
     function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
-        require(balance > 0, "No ether left to withdraw");
+        require(balance > 0, "Can't withdraw");
         (bool success,) = payable(owner()).call{value : balance}("");
-        require(success, "Transfer failed.");
+        require(success, "Tx failed.");
     }
 
     function placeNftOnSale(uint tokenId, uint newPrice) public payable {
@@ -274,14 +234,13 @@ contract NftMarket is ERC721URIStorage, Ownable {
     }
 
     function removeNftFromSale(uint tokenId) public {
-        require(ERC721.ownerOf(tokenId) == msg.sender, "You are not owner of this nft");
-        require(_idToNftItem[tokenId].isListed == true, "Item is already removed from sale");
+        require(ERC721.ownerOf(tokenId) == msg.sender, "Not owner!");
+        require(_idToNftItem[tokenId].isListed == true, "not sale");
         _idToNftItem[tokenId].isListed = false;
         _listedItems.decrement();
     }
 
-    function setNewPrice(uint tokenId, uint price) public {
-        require(ERC721.ownerOf(tokenId) == msg.sender, "You are not owner of this nft");
+    function setNewPrice(uint tokenId, uint price) public onlyOwner {
         RoyaltyInfo memory royalties = royaltyPerTokenId[tokenId];
         uint256 royaltyAmount = (price * royalties.amount) / 100;
         if (_idToNftItem[tokenId].isSold) {
@@ -292,11 +251,11 @@ contract NftMarket is ERC721URIStorage, Ownable {
 
     }
 
-    function _createNftItem(
+    function _createNft(
         uint tokenId,
         uint price
     ) private {
-        require(price > 0, "Price must be at least 1 wei");
+        require(price > 0, "!< 1 wei");
 
         _idToNftItem[tokenId] = NftItem(
             tokenId,

@@ -11,12 +11,12 @@ import { ExclamationIcon } from '@heroicons/react/solid';
 
 
 
-const NftCreate: NextPage = () => {
+const ProfileCreate: NextPage = () => {
  const {profile} = useProfile();
   const {network} = useNetwork();
   const [userURI, setUserURI] = useState("");
   const [imageURI, setImageURI]=useState("");
-  const addressWallet = '0x404a5F514B9BB04B0437c4113c3714367CCb8C53';
+
 
   const [userData, setUserData] = useState<UserData>({
     userName: "",
@@ -34,7 +34,7 @@ const NftCreate: NextPage = () => {
     const file = e.target.files[0];
     const buffer = await file.arrayBuffer();
     const bytes = new Uint8Array(buffer);
-    
+
     try {
       const promise = axios.post("/api/verify-image-profile", {
         bytes,
@@ -246,4 +246,4 @@ const NftCreate: NextPage = () => {
   )
 }
 
-export default NftCreate
+export default ProfileCreate

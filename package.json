@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "genContractType": "abi-types-generator './public/contracts/NftMarket.json' --output='./types' --name=nftMarketContract --provider=ethers_v5",
+    "genFactoryType": "abi-types-generator './public/contracts/Factory.json' --output='./types' --name=FactoryContract --provider=ethers_v5",
     "genProfileContractType": "abi-types-generator './userDB/abi/contracts/UserDb.json' --output='./types' --name=profileContract --provider=ethers_v5"
   },
   "dependencies": {
