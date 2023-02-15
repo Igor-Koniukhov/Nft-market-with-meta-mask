@@ -2,7 +2,7 @@ import React from 'react';
 
 import './Input.css';
 
-const filePicker = props => (
+const filePicker = (props) => (
   <div className="input">
     <label htmlFor={props.id}>{props.label}</label>
     <input

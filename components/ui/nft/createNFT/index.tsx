@@ -199,7 +199,67 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
                     createdAt,
                     //event
                 };
+                nftToDBHandler(data)
                 console.log(data)
+            })
+    }
+
+    const nftToDBHandler = (nftData: { tokenId: any; tokenURI: any; nftName: any; creator: any; owner: any; price: any; royalty: any; isListed: any; isSold: any; collectionId: any; networkId: any; createdAt?: BigNumberish; }) => {
+        let graphqlQuery = {
+            query: `
+          mutation CreateNewNft($tokenId: String!, $tokenURI: String!, $nftName: String!, $creator: String!, $owner: String!, $price: String!,$royalty: String!, $isListed: Boolean!, $isSold: Boolean!, $collectionId: String!, $networkId: String!) {
+            createNft(nftInput: {tokenId: $tokenId, tokenURI: $tokenURI, nftName: $nftName, creator: $creator, owner: $owner, price: $price, royalty: $royalty, isListed: $isListed, isSold: $isSold, collectionId: $collectionId, networkId: $networkId}) {
+              _id
+              tokenId,
+                    tokenURI,
+                    nftName,
+                    creator,
+                    owner,
+                    price,
+                    royalty,
+                    isListed,
+                    isSold,
+                    collectionId,
+                    networkId,
+                    createdAt,
+              
+            }
+          }
+        `,
+            variables: {
+                tokenId: nftData.tokenId._hex.toString(),
+                tokenURI: nftData.tokenURI.hash.toString(),
+                nftName: nftData.nftName,
+                creator: nftData.creator,
+                owner: nftData.owner,
+                price: nftData.price._hex.toString(),
+                royalty: nftData.royalty.toString(),
+                isListed: nftData.isListed,
+                isSold: nftData.isSold,
+                collectionId: nftData.collectionId._hex.toString(),
+                networkId: nftData.networkId.data.toString()
+            }
+        };
+
+        console.log(graphqlQuery)
+        return fetch('http://localhost:8080/graphql', {
+            method: 'POST',
+            body: JSON.stringify(graphqlQuery),
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(resData => {
+                if (resData.errors && resData.errors[0].status === 422) {
+                    throw new Error(
+                        "Validation failed. Make sure the email address isn't used yet!"
+                    );
+                }
+                console.log(resData.errors)
             })
     }
 

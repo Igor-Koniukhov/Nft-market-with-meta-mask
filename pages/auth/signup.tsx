@@ -1,12 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 
 import type { NextPage } from 'next'
-import {ChangeEvent, FormEvent, useState} from 'react';
+import {ChangeEvent, useState} from 'react';
 import {BaseLayout} from '@ui'
-import {required, length, email} from '../../../util/validators';
+import {required, length, email} from '../../util/validators';
+import {useRouter} from "next/router";
+import {useDispatch} from "react-redux";
 
 
-const Index: NextPage = () => {
+
+const SignUp: NextPage = () => {
+    const router = useRouter()
+
     const [authInfo, setAuthInfo] = useState({
         isAuth: false,
         authLoading: false,
@@ -26,7 +31,7 @@ const Index: NextPage = () => {
                 touched: false,
                 validators: [required, length({min: 5})]
             },
-            userName: {
+            name: {
                 value: '',
                 valid: false,
                 touched: false,
@@ -36,15 +41,37 @@ const Index: NextPage = () => {
         }
     })
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+    const inputChangeHandler = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = e.target;
-        setUserData({...userData, [name]: value});
-    }
-
-
+        console.log(userData)
+        setUserData(prevState => {
+            let isValid = true;
+            // @ts-ignore
+            for (const validator of prevState.signupForm[name].validators) {
+                isValid = isValid && validator(value);
+            }
+            const updatedForm = {
+                ...prevState.signupForm,
+                [name]: {
+                    // @ts-ignore
+                    ...prevState.signupForm[name],
+                    valid: isValid,
+                    value: value
+                }
+            };
+            let formIsValid = true;
+            for (const inputName in updatedForm) {
+                // @ts-ignore
+                formIsValid = formIsValid && updatedForm[inputName].valid;
+            }
+            return {
+                signupForm: updatedForm,
+                formIsValid: formIsValid
+            };
+        });
+    };
     const signupHandler = (userData: { signupForm: any; }) => {
-
-
         const graphqlQuery = {
             query: `
         mutation CreateNewUser($email: String!, $name: String!, $password: String!) {
@@ -82,6 +109,7 @@ const Index: NextPage = () => {
                 console.log(resData);
                 setAuthInfo({...authInfo, isAuth: false, authLoading: false });
                 console.log(userData, authInfo)
+                router.push('/auth/login')
 
             })
             .catch(err => {
@@ -115,7 +143,7 @@ const Index: NextPage = () => {
                                         <div className="mt-1 flex rounded-md shadow-sm">
                                             <input
                                                 value={userData.signupForm['email'].value}
-                                                onChange={handleChange}
+                                                onChange={inputChangeHandler}
                                                 type="email"
                                                 name="email"
                                                 id="email"
@@ -126,31 +154,31 @@ const Index: NextPage = () => {
                                     </div>
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            Email
+                                            Password
                                         </label>
                                         <div className="mt-1 flex rounded-md shadow-sm">
                                             <input
                                                 value={userData.signupForm['password'].value}
-                                                onChange={handleChange}
+                                                onChange={inputChangeHandler}
                                                 type="password"
                                                 name="password"
                                                 id="password"
                                                 className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                                placeholder="example@gmail.com"
+                                                placeholder="password"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label htmlFor="userName" className="block text-sm font-medium text-gray-700">
+                                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                             Name
                                         </label>
                                         <div className="mt-1 flex rounded-md shadow-sm">
                                             <input
-                                                value={userData.signupForm['userName'].value}
-                                                onChange={handleChange}
+                                                value={userData.signupForm['name'].value}
+                                                onChange={inputChangeHandler}
                                                 type="text"
-                                                name="userName"
-                                                id="userName"
+                                                name="name"
+                                                id="name"
                                                 className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
                                                 placeholder="Name"
                                             />
@@ -179,4 +207,4 @@ const Index: NextPage = () => {
     )
 }
 
-export default Index
+export default SignUp;

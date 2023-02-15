@@ -28,7 +28,7 @@ const Profile: NextPage = () => {
     const {profile} = useProfile()
     const {account} = useAccount()
     const {eth} = useEthPrice()
-    const {contract, provider, ethereum, profileContract} = useWeb3()
+    const {contract,ethereum} = useWeb3()
     const [activeNft, setActiveNft] = useState<Nft>();
     const [royalty, setRoyalty] = useState<number | undefined>(activeNft?.tokenId)
     const [royaltyAmount, setRoyaltyAmount] = useState("")

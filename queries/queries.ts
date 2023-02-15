@@ -6,6 +6,8 @@ const client = new ApolloClient({
     cache: new InMemoryCache(),
 })
 
+const LOCALURL='http://localhost:8080/graphql'
+
 export const getURIById= async (id: string) =>{
     const query = `query GettokenIsMinteds($tokenId: String!){nfts(where: {tokenId: $tokenId}){tokenURI}}`
     client

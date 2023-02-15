@@ -15,8 +15,7 @@ const NftOwnedCollection: NextPage = () => {
     let {pid} = router.query
     console.log(collections.path)
 
-
-    const [collectionState, setCollectionState] = useState<Collection>({
+    const initialCollection:Collection = {
         description: "",
         image: "",
         collectionId: 0,
@@ -26,7 +25,9 @@ const NftOwnedCollection: NextPage = () => {
         creator: "",
         isPublished: false
 
-    })
+    }
+
+    const [collectionState, setCollectionState] = useState<Collection>(initialCollection)
         dispatch(setAddress(pid))
     if (pid){
         localStorage.setItem('collection', pid as string)
@@ -42,7 +43,6 @@ const NftOwnedCollection: NextPage = () => {
             getCurrentCollectionData(data)
 
     }, [data]);
-
 
     return (
         <BaseLayout>
@@ -64,16 +64,12 @@ const NftOwnedCollection: NextPage = () => {
                         collectionId={collectionState.collectionId.toString()}
                         address={collectionState.token}
                     />
-
-
-
             <h3
                 className="
                 font-bold
                 text-3xl
                 text-center
                 mb-4
-
                 "> Owned collection name:  {collectionState.symbol}</h3>
             <NftList/>
         </BaseLayout>
