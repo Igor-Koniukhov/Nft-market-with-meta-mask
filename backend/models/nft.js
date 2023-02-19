@@ -4,24 +4,38 @@ const Schema = mongoose.Schema;
 
 const nftSchema = new Schema(
     {
+        name: {
+            type: String,
+            required: true
+        },
+        description: {
+            type: String,
+            required: true
+        },
+        image: {
+            type: String,
+            required: true
+        },
+        attributes_furry: {
+            type: String,
+            required: true
+        },
+        attributes_scary: {
+            type: String,
+            required: true
+        },
         tokenId: {
             type: String,
             required: true
         },
-        tokenURI: {
-            type: String,
-            required: true
-        },
-        nftName: {
-            type: String,
-            required: true
-        },
         creator: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'User',
             required: true
         },
         owner: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'User',
             required: true
         },
         price: {

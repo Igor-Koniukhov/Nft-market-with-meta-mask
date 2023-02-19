@@ -1,8 +1,20 @@
-import React from 'react';
+import React, {FunctionComponent} from 'react';
 
-import './Input.css';
+import '../form.css';
+type FilePicker = {
+    id: string;
+    label: string;
+    control: string;
+    valid: boolean;
+    touched: boolean;
+    type: any;
+    value: any;
+    placeholder: string;
+    onChange: (id:any, value: any, files: any) => void;
+    onBlur: () => void;
+}
 
-const filePicker = (props) => (
+const FilePicker: FunctionComponent<FilePicker> = (props) => (
   <div className="input">
     <label htmlFor={props.id}>{props.label}</label>
     <input
@@ -18,4 +30,4 @@ const filePicker = (props) => (
   </div>
 );
 
-export default filePicker;
+export default FilePicker;

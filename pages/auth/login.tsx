@@ -25,14 +25,14 @@ const Login: NextPage = () => {
     loginForm: {
       email: {
         value: '',
-        valid: true,
-        touched: true,
+        valid: false,
+        touched: false,
         validators: [required, email]
       },
       password: {
         value: '',
-        valid: true,
-        touched: true,
+        valid: false,
+        touched: false,
         validators: [required, length({ min: 5 })]
       },
       formIsValid: false
@@ -41,7 +41,7 @@ const Login: NextPage = () => {
 
 
  const inputChangeHandler = (input: string | number, value: any) => {
-    // @ts-ignore
+
    setState((prevState: { loginForm: { [x: string]: any; }; }) => {
       let isValid = true;
       for (const validator of prevState.loginForm[input].validators) {
@@ -92,7 +92,7 @@ const Login: NextPage = () => {
         password: authData.loginForm!.password.value
       }
     };
-    console.log(graphqlQuery, authData.loginForm!.email.value, authData.loginForm!.password.value)
+
 
     fetch('http://localhost:8080/graphql', {
       method: 'POST',
@@ -114,7 +114,7 @@ const Login: NextPage = () => {
             console.log(resData.errors)
             throw new Error('User login failed!');
           }
-          console.log(resData);
+
           setLoginState({...loginState,
             isAuth: true,
             token: resData.data.login.token,
@@ -141,9 +141,9 @@ const Login: NextPage = () => {
           });
         });
   };
-  const inputBlurHandler = (input) => {
+  const inputBlurHandler = (input: string | number) => {
     setState(prevState => {
-      return {
+        return {
         loginForm: {
           ...prevState.loginForm,
           [input]: {
@@ -164,18 +164,16 @@ const Login: NextPage = () => {
               <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
                 <div>
 
-
                     <Input
                         id="email"
                         label="Your E-Mail"
-                        value={state.loginForm['email'].value}
+                        value={state.loginForm.email.value}
                         onChange={inputChangeHandler}
                         onBlur={inputBlurHandler.bind(this, 'email')}
-                        valid={state.loginForm['email'].valid}
-                        touched={state.loginForm['email'].touched}
+                        valid={state.loginForm.email.valid}
+                        touched={state.loginForm.email.touched}
                         type="email"
                         placeholder="example@gmail.com"
-                        control="input"
                      />
 
                 </div>
@@ -183,17 +181,13 @@ const Login: NextPage = () => {
 
                     <Input
                         id="password"
-
                         label="Password"
                         type="password"
-                        control="input"
-                        value={state.loginForm['password'].value}
+                        value={state.loginForm.password.value}
                         onBlur={inputBlurHandler.bind(this, 'password')}
-                        valid={state.loginForm['password'].valid}
-                        touched={state.loginForm['password'].touched}
+                        valid={state.loginForm.password.valid}
+                        touched={state.loginForm.password.touched}
                         onChange={inputChangeHandler}
-
-
                         placeholder="password"
                     />
 

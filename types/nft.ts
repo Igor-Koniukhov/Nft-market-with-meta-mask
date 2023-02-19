@@ -1,3 +1,4 @@
+import {BigNumber, BigNumberish} from "ethers";
 
 export type Trait = "fury" | "scary";
 
@@ -57,6 +58,41 @@ export type FileReq = {
   bytes: Uint8Array;
   contentType: string;
   fileName: string;
+}
+
+export type FullNftData = {
+  tokenId: BigNumberish | BigNumber,
+  name: string;
+  description: string;
+  image: string;
+  attributes_furry: string;
+  attributes_scary: string;
+  creator: string,
+  owner: string,
+  price: BigNumberish | BigNumber,
+  royalty: BigNumberish | BigNumber,
+  isListed: boolean,
+  isSold: boolean,
+  collectionId: BigNumberish | BigNumber,
+  networkId: BigNumberish | BigNumber
+
+}
+export type FullNftDataMDBResponse = {
+  name: string;
+  description: string;
+  image: string;
+  attributes_furry: string;
+  attributes_scary: string;
+  tokenId: string,
+  creator: string,
+  owner: string,
+  price: string,
+  royalty: string,
+  isListed: boolean,
+  isSold: boolean,
+  collectionId: string,
+  networkId: string
+
 }
 
 export type PinataRes = {

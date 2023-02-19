@@ -1,23 +1,23 @@
 /* eslint-disable @next/next/no-img-element */
 
-import type { NextPage } from 'next'
-import {ChangeEvent, useState} from 'react';
+import type {NextPage} from 'next'
+import React, {useRef, useState} from 'react';
 import {BaseLayout} from '@ui'
-import {required, length, email} from '../../util/validators';
 import {useRouter} from "next/router";
-import {useDispatch} from "react-redux";
-
-
+import Input from '../../components/ui/Form/Input/Input'
+import {email, length, required} from '../../util/validators';
+import {useAccount} from "@hooks/web3";
 
 const SignUp: NextPage = () => {
     const router = useRouter()
+    const {account}=useAccount()
 
     const [authInfo, setAuthInfo] = useState({
         isAuth: false,
         authLoading: false,
         error: null
     })
-    const [userData, setUserData] = useState({
+    const [state, setState] = useState({
         signupForm: {
             email: {
                 value: '',
@@ -41,29 +41,24 @@ const SignUp: NextPage = () => {
         }
     })
 
+    const inputChangeHandler = (input: string | number, value: any) => {
 
-    const inputChangeHandler = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name, value} = e.target;
-        console.log(userData)
-        setUserData(prevState => {
+        setState((prevState: { signupForm: { [x: string]: any; }; }) => {
             let isValid = true;
-            // @ts-ignore
-            for (const validator of prevState.signupForm[name].validators) {
+            for (const validator of prevState.signupForm[input].validators) {
                 isValid = isValid && validator(value);
             }
             const updatedForm = {
                 ...prevState.signupForm,
-                [name]: {
-                    // @ts-ignore
-                    ...prevState.signupForm[name],
+                [input]: {
+                    ...prevState.signupForm[input],
                     valid: isValid,
                     value: value
                 }
             };
             let formIsValid = true;
             for (const inputName in updatedForm) {
-                // @ts-ignore
-                formIsValid = formIsValid && updatedForm[inputName].valid;
+                formIsValid = true
             }
             return {
                 signupForm: updatedForm,
@@ -71,20 +66,22 @@ const SignUp: NextPage = () => {
             };
         });
     };
-    const signupHandler = (userData: { signupForm: any; }) => {
+
+    const signupHandler = (state: { signupForm: any; }) => {
         const graphqlQuery = {
             query: `
-        mutation CreateNewUser($email: String!, $name: String!, $password: String!) {
-          createUser(userInput: {email: $email, name: $name, password: $password}) {
+        mutation CreateNewUser($email: String!, $name: String!, $password: String!, $address: String!) {
+          createUser(userInput: {email: $email, name: $name, password: $password, address: $address}) {
             _id
             email
           }
         }
       `,
             variables: {
-                email: userData.signupForm.email.value,
-                name: userData.signupForm.name.value,
-                password: userData.signupForm.password.value
+                email: state.signupForm.email.value,
+                name: state.signupForm.name.value,
+                password: state.signupForm.password.value,
+                address: account.data
             }
         };
         fetch('http://localhost:8080/graphql', {
@@ -106,9 +103,9 @@ const SignUp: NextPage = () => {
                 if (resData.errors) {
                     throw new Error('User creation failed!');
                 }
-                console.log(resData);
-                setAuthInfo({...authInfo, isAuth: false, authLoading: false });
-                console.log(userData, authInfo)
+
+                setAuthInfo({...authInfo, isAuth: false, authLoading: false});
+
                 router.push('/auth/login')
 
             })
@@ -121,11 +118,24 @@ const SignUp: NextPage = () => {
                 });
             });
     };
+    const inputBlurHandler = (input: string | number) => {
+        setState(prevState => {
+            return {
+                signupForm: {
+                    ...prevState.signupForm,
+                    [input]: {
+                        ...prevState.signupForm[input],
+                        touched: true
+                    }
+                }
+            };
+        });
+    };
+
 
     return (
         <BaseLayout>
             <div>
-
                 <div className="md:grid md:grid-cols-3 md:gap-6">
                     <div className="md:col-span-1">
                         <div className="px-4 sm:px-0">
@@ -133,64 +143,53 @@ const SignUp: NextPage = () => {
                         </div>
                     </div>
                     <div className="mt-5 md:mt-0 md:col-span-2 " style={{maxWidth: "500px"}}>
-                        <form >
+                        <form>
                             <div className="shadow sm:rounded-md sm:overflow-hidden">
                                 <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
-                                    <div>
-                                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                            Email
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <input
-                                                value={userData.signupForm['email'].value}
-                                                onChange={inputChangeHandler}
-                                                type="email"
-                                                name="email"
-                                                id="email"
-                                                className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                                placeholder="example@gmail.com"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            Password
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <input
-                                                value={userData.signupForm['password'].value}
-                                                onChange={inputChangeHandler}
-                                                type="password"
-                                                name="password"
-                                                id="password"
-                                                className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                                placeholder="password"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                                            Name
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <input
-                                                value={userData.signupForm['name'].value}
-                                                onChange={inputChangeHandler}
-                                                type="text"
-                                                name="name"
-                                                id="name"
-                                                className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                                placeholder="Name"
-                                            />
-                                        </div>
-                                    </div>
+                                    <Input
+                                        id="email"
+                                        label="Your E-Mail"
+                                        value={state.signupForm.email.value}
+                                        onChange={inputChangeHandler}
+                                        onBlur={inputBlurHandler.bind(this, 'email')}
+                                        valid={state.signupForm.email.valid}
+                                        touched={state.signupForm.email.touched}
+                                        type="email"
+                                        placeholder="example@gmail.com"
 
+                                    />
+                                    <div>
+                                        <div className="mt-1 flex rounded-md shadow-sm">
+                                            <Input
+                                                id="password"
+                                                label="Password"
+                                                type="password"
+                                                onBlur={inputBlurHandler.bind(this, 'password')}
+                                                onChange={inputChangeHandler}
+                                                value={state.signupForm.password.value}
+                                                valid={state.signupForm.password.valid}
+                                                touched={state.signupForm.password.touched}
+                                                placeholder='********'
+                                            />
+                                        </div>
+                                    </div>
+                                    <Input
+                                        id="name"
+                                        label="Your Name"
+                                        type="text"
+                                        onChange={inputChangeHandler}
+                                        onBlur={inputBlurHandler.bind(this, 'password')}
+                                        value={state.signupForm.name.value}
+                                        valid={state.signupForm.name.valid}
+                                        touched={state.signupForm.name.touched}
+                                        placeholder="your name"
+                                    />
 
 
                                 </div>
                                 <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
                                     <button
-                                        onClick={()=>signupHandler( userData)}
+                                        onClick={() => signupHandler(state)}
                                         type="button"
                                         className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     >
@@ -206,5 +205,7 @@ const SignUp: NextPage = () => {
         </BaseLayout>
     )
 }
+
+
 
 export default SignUp;

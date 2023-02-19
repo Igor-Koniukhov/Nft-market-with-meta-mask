@@ -1,10 +1,10 @@
-import {ChangeEvent, FunctionComponent, useState} from "react";
+import {ChangeEvent, FunctionComponent, useEffect, useState} from "react";
 import {Switch} from "@headlessui/react";
 import Link from "next/link";
 import {useWeb3} from "@providers/web3";
 import {useSelector} from "react-redux";
 import {selectAddress} from "../../../../store/slices/collectionSlice";
-import {NftMeta, PinataRes} from "@_types/nft";
+import {FullNftData, NftMeta, PinataRes} from "@_types/nft";
 import axios from "axios";
 import {toast} from "react-toastify";
 import {BigNumberish, ethers} from "ethers";
@@ -33,6 +33,23 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
     const [hasURI, setHasURI] = useState(false);
     const [royalty, setRoyalty] = useState(5)
     const collectionAddress = useSelector(selectAddress)
+
+    const [nftFullInfo, setNftFullInfo] = useState<FullNftData>({
+        name: "",
+        description: "",
+        image: "",
+        attributes_furry: "",
+        attributes_scary: "",
+        tokenId: 0,
+        creator: "",
+        owner: "",
+        price: 0,
+        royalty: 0,
+        isListed: false,
+        isSold: false,
+        collectionId: 0,
+        networkId: 0
+    })
 
 
     const [nftMeta, setNftMeta] = useState<NftMeta>({
@@ -90,6 +107,7 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
                 ...nftMeta,
                 image: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
             });
+
         } catch (e: any) {
             console.error(e.message);
         }
@@ -120,6 +138,14 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
                 signature: signedData,
                 nft: nftMeta
             })
+            setNftFullInfo({
+                ...nftFullInfo,
+                name: nftMeta.name,
+                description: nftMeta.description,
+                image: nftMeta.image,
+                attributes_furry: nftMeta.attributes[0].value,
+                attributes_scary: nftMeta.attributes[1].value,
+            })
 
             const res = await toast.promise(
                 promise, {
@@ -134,114 +160,71 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
             console.error(e.message);
         }
     }
-
-    const createNft = async () => {
-        try {
-            const tx = await contract?.mintToken(
-                nftURI,
-                nftMeta.name,
-                ethers.utils.parseEther(price),
-                royalty,
-                5, {
-                    value: ethers.utils.parseEther(0.025.toString())
-                },
-            );
-
-            await toast.promise(
-                tx!.wait(), {
-                    pending: "Minting Nft Token",
-                    success: "Nft has ben created",
-                    error: "Minting error"
-                }
-            );
-            setHasURI(false)
-            setNftURI("")
-            setNftMeta({
-                name: "",
-                description: "",
-                image: "",
-                attributes: [
-                    {trait_type: "fury", value: "0"},
-                    {trait_type: "scary", value: "0"}
-                ]
-            })
-        } catch (e: any) {
-            console.error(e.message);
-        }
-        await contract!.on('NFT',
-            (
-                tokenId: BigNumberish,
-                tokenURI: string,
-                nftName: string,
-                creator: string,
-                owner: string,
-                price: BigNumberish,
-                royalty: BigNumberish,
-                isListed: boolean,
-                isSold: boolean,
-                collectionId: BigNumberish,
-                networkId: BigNumberish,
-                createdAt: BigNumberish,
-                //event: NFTEventEmittedResponse
-            ) => {
-                let data = {
-                    tokenId,
-                    tokenURI,
-                    nftName,
-                    creator,
-                    owner,
-                    price,
-                    royalty,
-                    isListed,
-                    isSold,
-                    collectionId,
-                    networkId,
-                    createdAt,
-                    //event
-                };
-                nftToDBHandler(data)
-                console.log(data)
-            })
-    }
-
-    const nftToDBHandler = (nftData: { tokenId: any; tokenURI: any; nftName: any; creator: any; owner: any; price: any; royalty: any; isListed: any; isSold: any; collectionId: any; networkId: any; createdAt?: BigNumberish; }) => {
+    const nftToDBHandler = async (nftData: FullNftData) => {
         let graphqlQuery = {
             query: `
-          mutation CreateNewNft($tokenId: String!, $tokenURI: String!, $nftName: String!, $creator: String!, $owner: String!, $price: String!,$royalty: String!, $isListed: Boolean!, $isSold: Boolean!, $collectionId: String!, $networkId: String!) {
-            createNft(nftInput: {tokenId: $tokenId, tokenURI: $tokenURI, nftName: $nftName, creator: $creator, owner: $owner, price: $price, royalty: $royalty, isListed: $isListed, isSold: $isSold, collectionId: $collectionId, networkId: $networkId}) {
+          mutation CreateNewNft(
+          $tokenId: String!, 
+          $name: String!, 
+          $description: String!, 
+          $image: String!, 
+          $attributes_furry: String!, 
+          $attributes_scary: String!,    
+          $price: String!, 
+          $royalty: String!, 
+          $isListed: Boolean!, 
+          $isSold: Boolean!, 
+          $collectionId: String!, 
+          $networkId: String!
+          ) {
+            createNft(
+            nftInput: {
+            tokenId: $tokenId, 
+            name: $name,
+            description: $description,
+            image: $image,
+            attributes_furry: $attributes_furry,
+            attributes_scary: $attributes_scary,        
+            price: $price, 
+            royalty: $royalty, 
+            isListed: $isListed, 
+            isSold: $isSold, 
+            collectionId: $collectionId, 
+            networkId: $networkId
+            }) {
               _id
               tokenId,
-                    tokenURI,
-                    nftName,
-                    creator,
-                    owner,
-                    price,
-                    royalty,
-                    isListed,
-                    isSold,
-                    collectionId,
-                    networkId,
-                    createdAt,
+              name,
+              description,
+              image,
+              attributes_furry,
+              attributes_scary,
+              price,
+              royalty,
+              isListed,
+              isSold,
+              collectionId,
+              networkId            
               
             }
           }
         `,
             variables: {
-                tokenId: nftData.tokenId._hex.toString(),
-                tokenURI: nftData.tokenURI.hash.toString(),
-                nftName: nftData.nftName,
-                creator: nftData.creator,
-                owner: nftData.owner,
-                price: nftData.price._hex.toString(),
+                tokenId: nftData.tokenId.toString(),
+                name: nftData.name,
+                description: nftData.description,
+                image: nftData.image,
+                attributes_furry: nftData.attributes_furry,
+                attributes_scary: nftData.attributes_scary,
+                price: nftData.price.toString(),
                 royalty: nftData.royalty.toString(),
                 isListed: nftData.isListed,
                 isSold: nftData.isSold,
-                collectionId: nftData.collectionId._hex.toString(),
-                networkId: nftData.networkId.data.toString()
+                collectionId: nftData.collectionId.toString(),
+                networkId: nftData.networkId.toString()
             }
         };
 
-        console.log(graphqlQuery)
         return fetch('http://localhost:8080/graphql', {
             method: 'POST',
             body: JSON.stringify(graphqlQuery),
@@ -262,6 +245,101 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
                 console.log(resData.errors)
             })
     }
+    const createNft = async () => {
+        try {
+            const tx = await contract?.mintToken(
+                nftURI,
+                nftMeta.name,
+                ethers.utils.parseEther(price),
+                royalty,
+                5, {
+                    value: ethers.utils.parseEther(0.025.toString())
+                },
+            );
+
+            await toast.promise(
+                tx!.wait(), {
+                    pending: "Minting Nft Token",
+                    success: "Nft has ben created",
+                    error: "Minting error"
+                }
+            );
+
+        } catch (e: any) {
+            console.error(e.message);
+        }
+        await contract!.on('NFT',
+            (
+                tokenId: BigNumberish,
+                tokenURI: string,
+                nftName: string,
+                creator: string,
+                owner: string,
+                price: BigNumberish,
+                royalty: BigNumberish,
+                isListed: boolean,
+                isSold: boolean,
+                collectionId: BigNumberish,
+                networkId: BigNumberish
+                //event: NFTEventEmittedResponse
+            ) => {
+                let data = {
+                    tokenId,
+                    tokenURI,
+                    nftName,
+                    creator,
+                    owner,
+                    price,
+                    royalty,
+                    isListed,
+                    isSold,
+                    collectionId,
+                    networkId
+                    //event
+                };
+                if (data && nftMeta) {
+                    setNftFullInfo(
+                        {
+                            ...nftFullInfo,
+                            tokenId: data.tokenId,
+                            creator: data.creator,
+                            owner: data.owner,
+                            price: data.price,
+                            royalty: data.royalty,
+                            isListed: data.isListed,
+                            isSold: data.isSold,
+                            collectionId: data.collectionId,
+                            networkId: data.networkId
+
+                        })
+                }
+
+
+
+            })
+
+        setHasURI(false)
+        setNftURI("")
+        setNftMeta({
+            name: "",
+            description: "",
+            image: "",
+            attributes: [
+                {trait_type: "fury", value: "0"},
+                {trait_type: "scary", value: "0"}
+            ]
+        })
+    }
+    let isCreator= nftFullInfo.creator.length > 0
+
+useEffect(()=>{
+    if(isCreator ){
+        console.log(nftFullInfo)
+        nftToDBHandler(nftFullInfo)
+    }
+
+},[isCreator])
+
 
     return (
         <div>

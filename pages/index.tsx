@@ -1,13 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 
 import type {NextPage} from 'next';
-import {BaseLayout, CollectionsList, NftList, Search} from '@ui';
+import {BaseLayout, CollectionsList, NftList, NftListMDB, Search} from '@ui';
 import {useListedCollections, useNetwork} from '@hooks/web3';
 import {ExclamationIcon} from '@heroicons/react/solid';
 import Pricefilter from "@ui/filter/priceFilter/priceFilter";
 import {useState} from "react";
 import {getTokenByPriceRange} from "../queries/queries";
-
 import {Collection} from "@_types/nft";
 
 
@@ -15,7 +14,6 @@ import {Collection} from "@_types/nft";
 const Home: NextPage = () => {
     const {network} = useNetwork();
    const {collections}=useListedCollections();
-
 
 
     const [priceFrom, setPriceFrom] = useState('25000000000000000');
@@ -103,7 +101,9 @@ const Home: NextPage = () => {
                         </p>
                     </div>
                     {network.isConnectedToNetwork ?
-                        <NftList/> :
+                        <><NftList/>
+                            <h3 className="p-3 mt-5 text-center font-bold text-3xl">NFTs FROM MONGODB</h3>
+                            <NftListMDB/> </>:
                         <div className="rounded-md bg-yellow-50 p-4 mt-10">
                             <div className="flex">
                                 <div className="flex-shrink-0">

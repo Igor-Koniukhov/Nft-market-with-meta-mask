@@ -110,7 +110,6 @@ export interface CollectionnftResponse {
   6: boolean;
 }
 export interface FactoryContract {
-  on(arg0: string, arg1: (Collection: string, Name: string, Symbol: string, collectionId: BigNumberish) => void);
   /**
    * Payable: false
    * Constant: true

@@ -10,6 +10,10 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  address:{
+    type: String,
+    required: true
+  },
   name: {
     type: String,
     required: true
@@ -18,7 +22,7 @@ const userSchema = new Schema({
     type: String,
     default: 'I am new!'
   },
-  posts: [
+  nfts: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Post'

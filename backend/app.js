@@ -1,4 +1,5 @@
 const path = require('path');
+require("dotenv").config({path: "./.env"});
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -99,7 +100,7 @@ app.use((error, req, res, next) => {
 mongoose.set('strictQuery', true);
 mongoose
   .connect(
-      'mongodb+srv://koniukhov:ik0958212245@cluster0.ot6sdh8.mongodb.net/?retryWrites=true&w=majority'
+      process.env.NEXT_PUBLIC_MONGODB
   )
   .then(result => {
     app.listen(8080);
