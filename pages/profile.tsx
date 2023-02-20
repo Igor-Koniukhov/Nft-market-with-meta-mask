@@ -12,6 +12,8 @@ import axios from "axios";
 import {toast} from "react-toastify";
 import {ethers} from "ethers";
 import {getURIById} from "../queries/queries";
+import {useSelector} from "react-redux";
+import {selectNameUser} from "../store/slices/authSlice";
 
 
 
@@ -38,6 +40,7 @@ const Profile: NextPage = () => {
     const [isVisible, setIsVisible] = useState(false)
     const [isPriceInput, setIsVisiblePriceInput] = useState(false)
     const [newPrice, setNewPrice] = useState("");
+    const userName = useSelector(selectNameUser)
 
 
     const [nftMeta, setNftMeta] = useState<NftMeta>({
@@ -166,7 +169,7 @@ const Profile: NextPage = () => {
 
                                             </>
                                             :
-                                           <div className="pt-3 pb-3 ">John Dou</div> }
+                                           <div className="pt-3 pb-3 ">{userName}</div> }
                                         </div>
                                         <div>
                                         {profile.data?.image ?

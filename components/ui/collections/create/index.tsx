@@ -4,15 +4,11 @@ import {toast} from "react-toastify";
 import {CollectionMeta, PinataRes} from "@_types/nft";
 import {BigNumberish} from "ethers";
 import {useWeb3} from "@providers/web3";
-import {useSelector} from "react-redux";
-import {selectAddress} from "../../../../store/slices/collectionSlice";
 
 
 const CollectionCreate: FunctionComponent = () => {
     const {ethereum, factory} = useWeb3();
     const [collectionURI, setCollectionURI] = useState("");
-
-    const collectionAddress = useSelector(selectAddress)
 
     const [collectionMeta, setCollectionMeta] = useState<CollectionMeta>({
         cName: "",
@@ -78,18 +74,26 @@ const CollectionCreate: FunctionComponent = () => {
                     error: "Image upload error"
                 }
             )
+            setCollectionMeta(
+                {
+                    cName: "",
+                    cSymbol: "",
+                    cDescription: "",
+                    image: ""
+                }
+            )
 
-        }else{
+        } else {
             console.log(" collection URI: ", collectionURI)
         }
 
     }
 
-    useEffect(()=>{
-        collectionHandler().catch((e)=>{
+    useEffect(() => {
+        collectionHandler().catch((e) => {
             console.error(e, " Collection error creation.")
         })
-    },[collectionURI])
+    }, [collectionURI])
 
     const handleCollectionInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = e.target;

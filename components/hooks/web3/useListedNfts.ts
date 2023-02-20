@@ -47,7 +47,6 @@ export const hookFactory: ListedNftsHookFactory = ({contract}) => () => {
           value: ethers.utils.parseEther(value.toString())
         }
       )
-        console.log(result.data, parseInt(result.value._hex, 16), result.hash, "result data")
 
       await toast.promise(
         result!.wait(), {
@@ -56,6 +55,7 @@ export const hookFactory: ListedNftsHookFactory = ({contract}) => () => {
           error: "Processing error"
         }
       );
+
     } catch (e: any) {
       console.error(e.message);
     }

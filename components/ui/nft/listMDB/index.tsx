@@ -5,7 +5,6 @@ import {useListedNfts} from "@hooks/web3";
 
 const NftListMDB: FunctionComponent = () => {
 
-
     const [state, setState] = useState({
         isEditing: false,
         allNfts: [] as any[],
@@ -18,12 +17,13 @@ const NftListMDB: FunctionComponent = () => {
     })
     const {nfts} = useListedNfts();
 
+
     useEffect(() => {
         const loadNft = (direction: string) => {
             if (direction) {
                 setState({...state, nftsLoading: true, allNfts: []});
             }
-            let page = state.nftPage;
+            let page = 1
             if (direction === 'next') {
                 page++;
                 setState({...state, nftPage: page});
@@ -44,8 +44,16 @@ const NftListMDB: FunctionComponent = () => {
               image
               attributes_furry
               attributes_scary
-              creator
-              owner
+              creator{
+              _id
+              name
+              address                
+              }
+              owner{
+              _id
+              name
+              address              
+              }
               price
               royalty
               isListed
@@ -71,11 +79,11 @@ const NftListMDB: FunctionComponent = () => {
                 })
                 .then(resData => {
                     if (resData.errors) {
-                        throw new Error('Fetching posts failed!');
+                        console.log(resData.errors)
+                        throw new Error( 'Fetching nfts failed!');
                     }
                     if (resData) {
                         setState({...state, allNfts: resData.data.nfts.nfts})
-
                     }
 
                 })
@@ -86,6 +94,7 @@ const NftListMDB: FunctionComponent = () => {
         loadNft('nextT')
 
     }, [])
+
 
     return (
         <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">

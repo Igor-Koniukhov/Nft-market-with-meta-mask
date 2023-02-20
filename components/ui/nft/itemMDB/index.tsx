@@ -1,10 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 
 import {FunctionComponent} from "react";
-import { FullNftDataMDBResponse} from "../../../../types/nft";
+import {FullNftDataMDBResponse} from "../../../../types/nft";
 import {useWeb3} from "@providers/web3";
 import {BigNumberish, ethers} from "ethers";
-import {number} from "prop-types";
 
 type NftItemProps = {
     item: FullNftDataMDBResponse;
@@ -24,6 +23,7 @@ const NftItemMDB: FunctionComponent<NftItemProps> = ({item, buyNft}) => {
             tokenId: BigNumberish,
             price: BigNumberish,
             royaltyAmount: BigNumberish,
+            priceWithRoyalty: BigNumberish,
             previousOwner: string,
             owner: string,
             boughtAt: BigNumberish,
@@ -32,21 +32,68 @@ const NftItemMDB: FunctionComponent<NftItemProps> = ({item, buyNft}) => {
                 tokenId,
                 price,
                 royaltyAmount,
+                priceWithRoyalty,
                 previousOwner,
                 owner,
                 boughtAt
             };
-            console.log(data)
+
         })
+    }
+    const nftBoughtResultToMDB = async (id: string) => {
+        const graphqlQuery = {
+            query: `
+        mutation BoughtNft($nftId: ID!, $isSold: Boolean!) {
+          boughtNft(id: $nftId, nftBoughtInput: { isSold: $isSold }) {
+            _id
+            isSold
+            owner {
+             name
+             address
+            }
+          }
+        }
+      `,
+            variables: {
+                nftId: id,
+                isSold: true,
+            }
+        };
+
+        fetch('http://localhost:8080/graphql', {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(graphqlQuery)
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(resData => {
+                if (resData.errors && resData.errors[0].status === 422) {
+                    throw new Error(
+                        "Validation failed. Make sure the email address isn't used yet!"
+                    );
+                }
+                if (resData.errors) {
+                    console.log(resData.errors)
+                    throw new Error('Bought is failed!');
+                }
+
+            })
+            .catch(err => {
+                console.log(err);
+
+            });
     }
 
     const buyNfthandler = async () => {
-        console.log(Number(item.tokenId), Number(ethers.utils.formatEther(item.price)))
-
-        await buyNft(Number(item.tokenId), Number(ethers.utils.formatEther(item.price))).then(() =>
-            nftBoughtEvent()
+        await buyNft(Number(item.tokenId), Number(ethers.utils.formatEther(item.price))).then((data) => {
+                nftBoughtResultToMDB(item._id)
+            }
         )
-
     }
     return (
         <>
@@ -69,8 +116,52 @@ const NftItemMDB: FunctionComponent<NftItemProps> = ({item, buyNft}) => {
                                 />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900 ml-3"> Creator: {shortifyAddress(item.creator)} </p>
-                                <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700"></p>
+                                <p
+                                    className="
+                                    text-sm
+                                    font-medium
+                                    text-gray-700
+                                    group-hover:text-gray-900
+                                    ml-3"
+                                > Creator: {shortifyAddress(item.creator.address)} </p>
+                                <p
+                                    className="
+                                    text-xs
+                                    font-medium
+                                    text-gray-700
+                                    group-hover:text-gray-700
+                                    ml-3"
+                                >Name: {item.creator.name}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center mt-2">
+                            <div>
+                                <img
+                                    className="inline-block h-9 w-9 rounded-full"
+                                    src="/images/default_avatar.png"
+                                    alt=""
+                                />
+                            </div>
+                            <div>
+                                <p
+                                    className="
+                                    text-sm
+                                    font-medium
+                                    text-gray-700
+                                    group-hover:text-gray-900
+                                    ml-3"
+                                > Owner: {shortifyAddress(item.owner.address)} </p>
+                                <p
+                                    className="
+                                    text-xs
+                                    font-medium
+                                    text-gray-700
+                                    group-hover:text-gray-700
+                                    ml-3"
+                                >Name: {item.owner.name}</p>
                             </div>
                         </div>
 
@@ -92,15 +183,15 @@ const NftItemMDB: FunctionComponent<NftItemProps> = ({item, buyNft}) => {
                             </dd>
                         </div>
 
-                            <div  className="flex flex-col px-4 pt-4">
-                                <dt className="order-2 text-sm font-medium text-gray-500">
-                                    furry
-                                </dt>
-                                <dd className="order-1 text-xl font-extrabold text-indigo-600">
-                                    {item.attributes_furry}
-                                </dd>
-                            </div>
-                        <div  className="flex flex-col px-4 pt-4">
+                        <div className="flex flex-col px-4 pt-4">
+                            <dt className="order-2 text-sm font-medium text-gray-500">
+                                furry
+                            </dt>
+                            <dd className="order-1 text-xl font-extrabold text-indigo-600">
+                                {item.attributes_furry}
+                            </dd>
+                        </div>
+                        <div className="flex flex-col px-4 pt-4">
                             <dt className="order-2 text-sm font-medium text-gray-500">
                                 scary
                             </dt>

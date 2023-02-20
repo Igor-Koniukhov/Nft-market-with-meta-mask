@@ -78,6 +78,7 @@ export type FullNftData = {
 
 }
 export type FullNftDataMDBResponse = {
+  _id: string;
   name: string;
   description: string;
   image: string;

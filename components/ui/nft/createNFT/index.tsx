@@ -279,9 +279,8 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
                 royalty: BigNumberish,
                 isListed: boolean,
                 isSold: boolean,
-                collectionId: BigNumberish,
                 networkId: BigNumberish
-                //event: NFTEventEmittedResponse
+
             ) => {
                 let data = {
                     tokenId,
@@ -293,7 +292,6 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
                     royalty,
                     isListed,
                     isSold,
-                    collectionId,
                     networkId
                     //event
                 };
@@ -308,14 +306,10 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
                             royalty: data.royalty,
                             isListed: data.isListed,
                             isSold: data.isSold,
-                            collectionId: data.collectionId,
                             networkId: data.networkId
 
                         })
                 }
-
-
-
             })
 
         setHasURI(false)
@@ -334,7 +328,6 @@ const CreateNFT: FunctionComponent<CollectionDataProps> = (
 
 useEffect(()=>{
     if(isCreator ){
-        console.log(nftFullInfo)
         nftToDBHandler(nftFullInfo)
     }
 

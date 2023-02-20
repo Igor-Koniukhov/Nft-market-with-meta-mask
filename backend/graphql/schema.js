@@ -29,11 +29,13 @@ module.exports = buildSchema(`
         address: String!        
         status: String!
         nfts: [NFT!]!
+        
     }
 
     type AuthData {
         token: String!
         userId: String!
+        name: String!
     }   
     
     type NftData {
@@ -63,7 +65,7 @@ module.exports = buildSchema(`
         networkId: String!
     }  
     input NftInputBoughtData {        
-        isSold: Boolean!    
+        isSold: Boolean!         
     }  
         
     type RootQuery {
@@ -71,6 +73,7 @@ module.exports = buildSchema(`
         nfts(page: Int): NftData!
         nft(id: ID!): NFT!
         user: User!
+        userRoleData(id: ID!): User!
     }
 
     type RootMutation {

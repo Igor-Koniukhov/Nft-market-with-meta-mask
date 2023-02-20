@@ -6,6 +6,7 @@ const User = require('../models/user');
 const Post = require('../models/post');
 const NFT = require('../models/nft');
 const {clearImage} = require('../util/file');
+const {mongoose} = require("mongoose");
 
 module.exports = {
     createUser: async function ({userInput}, req) {
@@ -27,7 +28,8 @@ module.exports = {
             throw error;
         }
         const existingUser = await User.findOne({email: userInput.email});
-        if (existingUser) {
+        const existingAddress = await User.findOne({address: userInput.address});
+        if (existingUser && existingAddress) {
             const error = new Error('User exists already!');
             throw error;
         }
@@ -43,6 +45,7 @@ module.exports = {
     },
     login: async function ({email, password}) {
         const user = await User.findOne({email: email});
+
         if (!user) {
             const error = new Error('User not found.');
             error.code = 401;
@@ -54,6 +57,7 @@ module.exports = {
             error.code = 401;
             throw error;
         }
+
         const token = jwt.sign(
             {
                 userId: user._id.toString(),
@@ -62,10 +66,10 @@ module.exports = {
             'somesupersecretsecret',
             {expiresIn: '1h'}
         );
-        return {token: token, userId: user._id.toString()};
+        console.log(user, " user")
+        return {token: token, userId: user._id.toString(), name: user.name};
     },
     createNft: async function ({nftInput}, req) {
-
         if (!req.isAuth) {
             const error = new Error('Not authenticated!');
             error.code = 401;
@@ -114,11 +118,11 @@ module.exports = {
     },
 
     nfts: async function ({page}, req) {
-        if (!req.isAuth) {
-          const error = new Error('Not authenticated!');
-          error.code = 401;
-          throw error;
-        }
+        /* if (!req.isAuth) {
+             const error = new Error('Not authenticated!');
+             error.code = 401;
+             throw error;
+         }*/
         if (!page) {
             page = 1;
         }
@@ -128,14 +132,16 @@ module.exports = {
             .sort({createdAt: -1})
             .skip((page - 1) * perPage)
             .limit(perPage)
-            .populate('creator');
+
         return {
-            nfts: nfts.map(p => {
+            nfts: nfts.map(async nft => {
                 return {
-                    ...p._doc,
-                    _id: p._id.toString(),
-                    createdAt: p.createdAt.toISOString(),
-                    updatedAt: p.updatedAt.toISOString()
+                    ...nft._doc,
+                    _id: nft._id.toString(),
+                    owner: User.findOne(nft.owner._id),
+                    creator: User.findOne(nft.creator._id),
+                    createdAt: nft.createdAt.toISOString(),
+                    updatedAt: nft.updatedAt.toISOString()
                 };
             }),
             totalNfts: totalNfts
@@ -158,6 +164,52 @@ module.exports = {
             _id: nft._id.toString(),
             createdAt: nft.createdAt.toISOString(),
             updatedAt: nft.updatedAt.toISOString()
+        };
+    },
+    boughtNft: async function ({id, nftBoughtInput}, req) {
+        const nft = await NFT.findById(id).populate('creator');
+        if (!nft) {
+            const error = new Error('No nft found!');
+            error.code = 404;
+            throw error;
+        }
+        const errors = [];
+
+        if (errors.length > 0) {
+            const error = new Error('Invalid input.');
+            error.data = errors;
+            error.code = 422;
+            throw error;
+        }
+
+        let owner = await User.findById(nft.owner._id.toString());
+        if (nft.owner._id.toString() !== req.userId.toString()){
+            owner.nfts = owner.nfts.filter(({_id}) =>
+                _id.toString() !== mongoose.Types.ObjectId(id).toString()
+            )
+            await owner.save()
+        }
+
+        if (nft.owner._id.toString() === req.userId) {
+            const error = new Error('You are owner!');
+            error.code = 401;
+            throw error;
+        }
+        const newOwner = await User.findById(req.userId);
+        if (!nft.isSold){
+            nft.price = (Number(nft.price) + (Number(nft.price) * Number(nft.royalty))/100)
+        }
+        nft.isSold = nftBoughtInput.isSold;
+        nft.owner = newOwner
+        const soldNft = await nft.save();
+        newOwner.nfts.push(soldNft)
+        await newOwner.save()
+
+        return {
+            ...soldNft._doc,
+            _id: soldNft._id.toString(),
+            createdAt: soldNft.createdAt.toISOString(),
+            updatedAt: soldNft.updatedAt.toISOString()
         };
     },
     updatePost: async function ({id, postInput}, req) {
@@ -234,12 +286,26 @@ module.exports = {
         return true;
     },
     user: async function (args, req) {
-        if (!req.isAuth) {
+        /*if (!req.isAuth) {
             const error = new Error('Not authenticated!');
             error.code = 401;
             throw error;
-        }
+        }*/
         const user = await User.findById(req.userId);
+        if (!user) {
+            const error = new Error('No user found!');
+            error.code = 404;
+            throw error;
+        }
+        return {...user._doc, _id: user._id.toString()};
+    },
+    userRoleData: async function ({id}, req) {
+        /*if (!req.isAuth) {
+            const error = new Error('Not authenticated!');
+            error.code = 401;
+            throw error;
+        }*/
+        const user = await User.findById(id);
         if (!user) {
             const error = new Error('No user found!');
             error.code = 404;

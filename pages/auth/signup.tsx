@@ -43,6 +43,7 @@ const SignUp: NextPage = () => {
 
     const inputChangeHandler = (input: string | number, value: any) => {
 
+        // @ts-ignore
         setState((prevState: { signupForm: { [x: string]: any; }; }) => {
             let isValid = true;
             for (const validator of prevState.signupForm[input].validators) {
@@ -124,6 +125,7 @@ const SignUp: NextPage = () => {
                 signupForm: {
                     ...prevState.signupForm,
                     [input]: {
+                        // @ts-ignore
                         ...prevState.signupForm[input],
                         touched: true
                     }

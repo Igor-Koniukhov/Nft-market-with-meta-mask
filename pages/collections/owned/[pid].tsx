@@ -13,7 +13,6 @@ const NftOwnedCollection: NextPage = () => {
     const dispatch = useDispatch()
     const router = useRouter()
     let {pid} = router.query
-    console.log(collections.path)
 
     const initialCollection:Collection = {
         description: "",

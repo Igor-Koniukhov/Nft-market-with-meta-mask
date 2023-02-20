@@ -6,7 +6,7 @@ import {useAccount, useNetwork} from '@hooks/web3';
 import ActiveLink from '../link';
 import Walletbar from './Walletbar';
 import {useDispatch, useSelector} from "react-redux";
-import {selectAuthState, setAuthState} from "../../../store/slices/authSlice";
+import {selectAuthState, selectNameUser, setAuthState} from "../../../store/slices/authSlice";
 import {useRouter} from "next/router";
 
 
@@ -18,7 +18,8 @@ export default function Navbar() {
     const dispatch = useDispatch();
     const {account} = useAccount();
     const {network} = useNetwork();
-    const isLogin = useSelector(selectAuthState)   ;
+    const isLogin = useSelector(selectAuthState);
+    const userName = useSelector(selectNameUser);
     const router = useRouter();
 
     const navigation = isLogin ? [
@@ -32,13 +33,14 @@ export default function Navbar() {
             {name: 'Login', href: '/auth/login', current: false}
 
         ]
-const logoutHandler = () => {
-    dispatch(setAuthState(false))
-    localStorage.removeItem('token');
-    localStorage.removeItem('expiryDate');
-    localStorage.removeItem('userId');
-    router.push('/auth/login')
-};
+    const logoutHandler = () => {
+        dispatch(setAuthState(false))
+        localStorage.removeItem('token');
+        localStorage.removeItem('expiryDate');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        router.push('/auth/login')
+    };
 
     return (
         <Disclosure as="nav" className="bg-gray-800">
@@ -82,14 +84,22 @@ const logoutHandler = () => {
                                                 </a>
                                             </ActiveLink>
                                         ))}
-                                        { isLogin &&
-                                            <button className="text-white" onClick={()=>logoutHandler()}>LogOut</button>
+                                        {isLogin &&
+                                            <>
+                                                <button className="text-white"
+                                                        onClick={() => logoutHandler()}>LogOut</button>
+
+                                            </>
+
                                         }
 
 
                                     </div>
+
                                 </div>
+
                             </div>
+                            <div className="text-white">{userName}</div>
                             <div
                                 className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                                 <div className="text-gray-300 self-center mr-2">
@@ -98,6 +108,7 @@ const logoutHandler = () => {
                     <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400" fill="currentColor" viewBox="0 0 8 8">
                       <circle cx={4} cy={4} r={3}/>
                     </svg>
+
                       {network.isLoading ?
                           "Loading..." :
                           account.isInstalled ?

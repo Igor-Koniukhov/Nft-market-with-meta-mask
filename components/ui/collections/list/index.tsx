@@ -1,9 +1,7 @@
 
 import { FunctionComponent } from "react";
 import {Collection} from "@_types/nft";
-import Image from "next/image"
 import Link from "next/link"
-import {useListedCollections} from "@hooks/web3";
 import {useDispatch} from "react-redux";
 import {setAddress} from "../../../../store/slices/collectionSlice";
 
@@ -12,12 +10,10 @@ type CollectionResponse ={
     collections: Collection[]
 }
 const List:FunctionComponent<CollectionResponse> = ({collections, path}) =>{
-    console.log(path, " path")
     const dispatch = useDispatch()
 
     const handleNftCollection = (address: string)=>{
         dispatch(setAddress(address))
-        console.log(address)
 
     }
     return (

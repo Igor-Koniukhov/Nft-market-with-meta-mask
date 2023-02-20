@@ -12,8 +12,9 @@ import {MetaMaskInpageProvider} from "@metamask/providers";
 import {NftMarketContract} from "@_types/nftMarketContract";
 import {ProfileContract} from "@_types/profileContract";
 import {FactoryContract} from "@_types/FactoryContract";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectAddress} from "../../../store/slices/collectionSlice";
+import {setAuthState, setNameUser} from "../../../store/slices/authSlice";
 
 const pageReload = () => {
     window.location.reload();
@@ -41,6 +42,7 @@ const Web3Context = createContext<Web3State>(createDefaultState());
 const Web3Provider: FunctionComponent = ({children}) => {
     const [web3Api, setWeb3Api] = useState<Web3State>(createDefaultState())
     const collectionAddress = useSelector(selectAddress)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         if(collectionAddress){
@@ -66,6 +68,10 @@ const Web3Provider: FunctionComponent = ({children}) => {
                         collectionAddress ||
                         localStorage.getItem('collection') ||
                         collections[0][0]);
+                }
+                if(localStorage.getItem('token')){
+                    dispatch(setAuthState(true))
+                    dispatch(setNameUser(localStorage.getItem('userName')))
                 }
                 setTimeout(() => setGlobalListeners(window.ethereum), 500);
                 setWeb3Api(createWeb3State({

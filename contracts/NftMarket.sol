@@ -58,6 +58,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         uint tokenId,
         uint price,
         uint royaltyAmount,
+        uint priceWithRoyalty,
         address previousOwner,
         address owner
     );
@@ -186,25 +187,27 @@ contract NftMarket is ERC721URIStorage, Ownable {
     function _sentRoyaltyAmount(address creator, uint256 amount) private {
         payable(creator).transfer(amount);
     }
-
+    //fallback receive function
+    receive() external payable {
+        revert();
+    }
     function buyNft(
         uint tokenId
-    ) public payable {
-        uint price = _idToNftItem[tokenId].price;
+    ) public payable returns (uint){
         address owner = ERC721.ownerOf(tokenId);
         require(msg.sender != owner, "Your's");
-        require(msg.value == price, "value != price");
+        require(msg.value == _idToNftItem[tokenId].price, "value != price");
 
         RoyaltyInfo memory royalties = royaltyPerTokenId[tokenId];
         address creator = royalties.recipient;
         uint256 royaltyAmount = (msg.value * royalties.amount) / 100;
         _transfer(owner, msg.sender, tokenId);
-
+        uint priceWithRoyalty = _idToNftItem[tokenId].price + royaltyAmount;
         if (_idToNftItem[tokenId].isSold) {
             payable(owner).transfer(msg.value - royaltyAmount);
             _sentRoyaltyAmount(creator, royaltyAmount);
         } else {
-            uint priceWithRoyalty = _idToNftItem[tokenId].price + royaltyAmount;
+
             _idToNftItem[tokenId].price = priceWithRoyalty;
             payable(owner).transfer(msg.value);
         }
@@ -213,7 +216,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _idToNftItem[tokenId].isListed = false;
         _idToNftItem[tokenId].isSold = true;
 
-        emit NftBought(tokenId, msg.value, royaltyAmount, owner, msg.sender);
+        emit NftBought(tokenId, msg.value, royaltyAmount, priceWithRoyalty, owner, msg.sender);
+        return _idToNftItem[tokenId].price;
     }
 
     function withdraw() external onlyOwner {

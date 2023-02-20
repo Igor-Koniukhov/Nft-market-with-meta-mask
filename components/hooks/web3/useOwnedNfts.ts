@@ -15,7 +15,7 @@ export type UseOwnedNftsHook = ReturnType<OwnedNftsHookFactory>
 
 export const hookFactory: OwnedNftsHookFactory = ({contract}) => () => {
     const {data, ...swr} = useSWR(
-        contract ? "web3/useOwnedNfts" : null,
+        contract ? `web3/useOwnedNfts${contract.address}` : null,
         async () => {
             const nfts = [] as Nft[];
             const coreNfts = await contract!.getOwnedNfts();

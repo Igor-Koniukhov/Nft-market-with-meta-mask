@@ -134,6 +134,7 @@ export interface NftBoughtEventEmittedResponse {
   tokenId: BigNumberish;
   price: BigNumberish;
   royaltyAmount: BigNumberish;
+  priceWithRoyalty: BigNumberish;
   previousOwner: string;
   owner: string;
 }
@@ -172,7 +173,6 @@ export interface RoyaltyinfoResponse {
   1: BigNumber;
 }
 export interface NftMarketContract {
-  on(arg0: string, arg1: (tokenId: BigNumberish, tokenURI: string, nftName: string, creator: string, owner: string, price: BigNumberish, royalty: BigNumberish, isListed: boolean, isSold: boolean, collectionId: BigNumberish, networkId: BigNumberish) => void);
   /**
    * Payable: false
    * Constant: false
